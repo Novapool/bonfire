@@ -1,7 +1,7 @@
 {
-  "name": "@party-game-framework/server",
+  "name": "@bonfire/server",
   "version": "0.1.0",
-  "description": "Server implementation for party game framework with Socket.io and database adapters",
+  "description": "Server implementation for Bonfire with Socket.io and database adapters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -18,6 +18,6 @@
   "author": "Laith Assaf",
   "license": "MIT",
   "dependencies": {
-    "@party-game-framework/core": "0.1.0"
+    "@bonfire/core": "0.1.0"
   }
 }

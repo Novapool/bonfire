@@ -1,7 +1,7 @@
 {
-  "name": "@party-game-framework/client",
+  "name": "@bonfire/client",
   "version": "0.1.0",
-  "description": "React hooks and UI components for party game framework",
+  "description": "React hooks and UI components for Bonfire",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -19,7 +19,7 @@
   "author": "Laith Assaf",
   "license": "MIT",
   "dependencies": {
-    "@party-game-framework/core": "0.1.0"
+    "@bonfire/core": "0.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0"

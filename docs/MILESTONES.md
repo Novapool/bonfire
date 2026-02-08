@@ -1,4 +1,4 @@
-# Party Game Framework - Development Milestones
+# Bonfire - Development Milestones
 
 > **Status Guide:** 🔴 Not Started | 🟡 In Progress | 🟢 Complete
 
@@ -12,7 +12,7 @@
 - [x] 🟢 Set up monorepo structure (npm workspaces)
 - [x] 🟢 Initialize TypeScript configuration for all packages
 - [x] 🟢 Define base `Game` class interface and types
-- [x] 🟢 Create package structure (`@party-game-framework/core`, `/server`, `/client`)
+- [x] 🟢 Create package structure (`@bonfire/core`, `/server`, `/client`)
 - [x] 🟢 Set up development tooling (ESLint, Prettier)
 - [x] 🟢 Initialize Git repository with proper .gitignore
 
@@ -158,7 +158,7 @@
 - [ ] 🔴 Add example game with comments
 - [ ] 🔴 Include README with quick start instructions
 - [ ] 🔴 Test on fresh machine (verify it "just works")
-- [ ] 🔴 Publish to npm as `create-party-game`
+- [ ] 🔴 Publish to npm as `create-bonfire-game`
 
 **Deliverable:** Working CLI that scaffolds new games in <1 minute
 

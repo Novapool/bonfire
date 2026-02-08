@@ -1,7 +1,7 @@
 {
-  "name": "@party-game-framework/core",
+  "name": "@bonfire/core",
   "version": "0.1.0",
-  "description": "Core types, interfaces, and base classes for party game framework",
+  "description": "Core types, interfaces, and base classes for Bonfire",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

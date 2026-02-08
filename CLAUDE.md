@@ -1,4 +1,4 @@
-# Party Game Framework
+# Bonfire
 
 An open-source TypeScript framework for building social party games - "Rails for party games".
 
@@ -24,7 +24,7 @@ Milestone 1: Foundation & Architecture (Not Started)
 
 Currently minimal (pre-Milestone 1):
 - `docs/` - Project documentation
-- Future: Monorepo with `@party-game-framework/core`, `/server`, `/client` packages
+- Future: Monorepo with `@bonfire/core`, `/server`, `/client` packages
 
 ## Tech Stack
 

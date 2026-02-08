@@ -1,4 +1,4 @@
-# Party Game Framework
+# Bonfire
 
 ## Project Vision
 
@@ -49,8 +49,8 @@ A comprehensive framework that provides:
 - **Phase 2 (Scale):** Railway + Socket.io + Redis/PostgreSQL - Full control, hard cost caps
 
 ### Distribution
-- **NPM Packages** - `@party-game-framework/core`, `/server`, `/client`
-- **CLI Tool** - `npx create-party-game my-game` for instant scaffolding
+- **NPM Packages** - `@bonfire/core`, `/server`, `/client`
+- **CLI Tool** - `npx create-bonfire-game my-game` for instant scaffolding
 - **Documentation Site** - Docusaurus or VitePress for guides and API reference
 
 ## Key Features
@@ -59,7 +59,7 @@ A comprehensive framework that provides:
 
 **Minimal Game Implementation:**
 ```javascript
-import { SocialGame } from '@party-game-framework/core';
+import { SocialGame } from '@bonfire/core';
 
 export default class MyGame extends SocialGame {
   config = {
@@ -101,7 +101,7 @@ export default class MyGame extends SocialGame {
 ```
 Framework Structure:
 ┌─────────────────────────────────────┐
-│   @party-game-framework/core        │
+│   @bonfire/core                     │
 │   - Base game classes                │
 │   - State management abstractions    │
 │   - Type definitions                 │
@@ -115,7 +115,7 @@ Framework Structure:
 └──────────────────┘  └──────────────────┘
            ↓
 ┌─────────────────────────────────────┐
-│   create-party-game (CLI)           │
+│   create-bonfire-game (CLI)         │
 │   - Project scaffolding             │
 │   - Template generation             │
 └─────────────────────────────────────┘

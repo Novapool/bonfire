@@ -1,5 +1,5 @@
 /**
- * Core type definitions for the Party Game Framework
+ * Core type definitions for Bonfire
  */
 
 /**

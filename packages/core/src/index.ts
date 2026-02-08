@@ -1,5 +1,5 @@
 /**
- * @party-game-framework/core
+ * @bonfire/core
  *
  * Core types, interfaces, and base classes for building party games
  */

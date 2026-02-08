@@ -5,7 +5,7 @@ An open-source TypeScript framework for building social party games - "Rails for
 ## Current Status
 Milestone 1: Foundation & Architecture ✅ Complete (Feb 8, 2026)
 Milestone 2: Core Game Engine ✅ Complete (Feb 8, 2026)
-**Next:** Milestone 3: Server Infrastructure 🔴 Not Started
+**Current:** Milestone 3: Server Infrastructure 🟡 In Progress (Phases 1-2 Complete, Phase 3 Next)
 
 ## Documentation
 
@@ -22,6 +22,8 @@ Milestone 2: Core Game Engine ✅ Complete (Feb 8, 2026)
 
 - `docs/architecture/` - System design, component structure, data flow
   - Read when: Understanding framework internals, contributing to core, debugging issues
+  - `core-classes.md` - Game engine architecture (SocialGame, PlayerManager, validators)
+  - `server-infrastructure.md` - Server classes (RoomManager, SocketStateSynchronizer, adapters)
 
 **Future documentation (create as needed):**
 - `docs/SETUP.md` - Local development setup instructions

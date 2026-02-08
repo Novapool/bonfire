@@ -20,20 +20,38 @@
 
 ---
 
-## Milestone 2: Core Game Engine 🔴
+## Milestone 2: Core Game Engine 🟢
 
 **Goal:** Build the fundamental game abstraction layer
 
 ### Tasks
-- [ ] 🔴 Implement phase management system (state machine)
-- [ ] 🔴 Create player management (join, leave, reconnect)
-- [ ] 🔴 Build room lifecycle (create, start, end, cleanup)
-- [ ] 🔴 Design game state synchronization interface
-- [ ] 🔴 Implement event system for game hooks (`onPhaseChange`, `onPlayerAction`)
-- [ ] 🔴 Add validation system (player limits, phase transitions)
-- [ ] 🔴 Write unit tests for core game logic
+- [x] 🟢 Implement phase management system (state machine)
+- [x] 🟢 Create player management (join, leave, reconnect)
+- [x] 🟢 Build room lifecycle (create, start, end, cleanup)
+- [x] 🟢 Design game state synchronization interface
+- [x] 🟢 Implement event system for game hooks (`onPhaseChange`, `onPlayerAction`)
+- [x] 🟢 Add validation system (player limits, phase transitions)
+- [x] 🟢 Write unit tests for core game logic
 
-**Deliverable:** Working `SocialGame` base class with lifecycle management
+**Deliverable:** ✅ Working `SocialGame` base class with lifecycle management
+
+**Completed:** February 8, 2026
+
+**What Was Built:**
+- **SocialGame class** - Main concrete implementation with full player lifecycle management
+- **PlayerManager** - Disconnect/reconnect handling with configurable timeout
+- **GameEventEmitter** - Type-safe event system for all lifecycle hooks
+- **GameValidator** - Centralized validation for all game rules
+- **StateManager** - Immutable state update utilities
+- **IStateSynchronizer** - Backend-agnostic interface for state sync
+- **Custom Error Classes** - GameError, ValidationError, StateError, PlayerError
+- **83 tests, 83.16% coverage** - Comprehensive test suite with integration tests
+- **Complete API documentation** - packages/core/README.md with examples
+- **Working example** - packages/core/examples/simple-game.ts
+
+**Architecture Documentation:** See `docs/architecture/core-classes.md` for detailed class design and relationships.
+
+**Time to Complete:** ~6 hours of focused development
 
 ---
 
@@ -264,9 +282,9 @@
 
 ## Progress Tracking
 
-**Overall Progress:** 1/13 milestones complete (7.7%)
+**Overall Progress:** 2/13 milestones complete (15.4%)
 
-**Current Focus:** Milestone 2 - Core Game Engine
+**Current Focus:** Milestone 3 - Server Infrastructure
 
 **Last Updated:** February 8, 2026
 
@@ -278,5 +296,9 @@
 
 - **Milestone 1 (Feb 8, 2026):** Chose npm workspaces over Turborepo for simplicity. Can migrate later if needed.
 - **Milestone 1:** Base Game class uses abstract methods for lifecycle hooks, allowing game-specific implementations while enforcing structure.
-- **Milestone 1:** TypeScript project references enable proper dependency management between packages. 
+- **Milestone 1:** TypeScript project references enable proper dependency management between packages.
+- **Milestone 2 (Feb 8, 2026):** Composition over inheritance - SocialGame uses PlayerManager and EventEmitter rather than deep class hierarchy.
+- **Milestone 2:** Custom EventEmitter (not Node's) for full TypeScript type safety and zero dependencies in core package.
+- **Milestone 2:** Backend-agnostic design via IStateSynchronizer interface allows swapping Firebase/Railway without core changes.
+- **Milestone 2:** Disconnect handling is complex enough to warrant dedicated PlayerManager class (timers, race conditions, cleanup). 
 

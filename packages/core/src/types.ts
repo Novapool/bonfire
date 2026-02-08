@@ -76,3 +76,54 @@ export interface PhaseTransition {
   to: Phase;
   timestamp: number;
 }
+
+/**
+ * Player connection tracking
+ */
+export interface PlayerConnection {
+  playerId: PlayerId;
+  isConnected: boolean;
+  disconnectedAt?: number;
+  timeoutTimer?: NodeJS.Timeout;
+}
+
+/**
+ * Room lifecycle status
+ */
+export type RoomStatus = 'waiting' | 'playing' | 'ended' | 'closed';
+
+/**
+ * Game event names
+ */
+export type GameEventType =
+  | 'player:joined'
+  | 'player:left'
+  | 'player:disconnected'
+  | 'player:reconnected'
+  | 'game:started'
+  | 'game:ended'
+  | 'phase:changed'
+  | 'room:closed';
+
+/**
+ * Typed event payloads for each event type
+ */
+export interface GameEventPayloads extends Record<string, unknown> {
+  'player:joined': { player: Player };
+  'player:left': { playerId: PlayerId; reason: 'manual' | 'timeout' };
+  'player:disconnected': { playerId: PlayerId };
+  'player:reconnected': { playerId: PlayerId };
+  'game:started': { startedAt: number };
+  'game:ended': { endedAt: number };
+  'phase:changed': PhaseTransition;
+  'room:closed': { roomId: RoomId };
+}
+
+/**
+ * Structured validation error
+ */
+export interface ValidationErrorDetails {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}

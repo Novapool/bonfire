@@ -1,0 +1,19 @@
+{
+  "name": "@party-game-framework/core",
+  "version": "0.1.0",
+  "description": "Core types, interfaces, and base classes for party game framework",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Tests coming soon\"",
+    "lint": "echo \"Linting coming soon\""
+  },
+  "keywords": [
+    "party-games",
+    "framework",
+    "core"
+  ],
+  "author": "Laith Assaf",
+  "license": "MIT"
+}

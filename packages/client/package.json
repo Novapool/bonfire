@@ -1,0 +1,27 @@
+{
+  "name": "@party-game-framework/client",
+  "version": "0.1.0",
+  "description": "React hooks and UI components for party game framework",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Tests coming soon\"",
+    "lint": "echo \"Linting coming soon\""
+  },
+  "keywords": [
+    "party-games",
+    "framework",
+    "client",
+    "react",
+    "hooks"
+  ],
+  "author": "Laith Assaf",
+  "license": "MIT",
+  "dependencies": {
+    "@party-game-framework/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  }
+}

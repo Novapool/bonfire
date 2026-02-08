@@ -1,0 +1,23 @@
+{
+  "name": "@party-game-framework/server",
+  "version": "0.1.0",
+  "description": "Server implementation for party game framework with Socket.io and database adapters",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Tests coming soon\"",
+    "lint": "echo \"Linting coming soon\""
+  },
+  "keywords": [
+    "party-games",
+    "framework",
+    "server",
+    "socket.io"
+  ],
+  "author": "Laith Assaf",
+  "license": "MIT",
+  "dependencies": {
+    "@party-game-framework/core": "0.1.0"
+  }
+}

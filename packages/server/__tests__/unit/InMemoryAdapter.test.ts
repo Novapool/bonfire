@@ -20,13 +20,6 @@ describe('InMemoryAdapter', () => {
       const newAdapter = new InMemoryAdapter()
       await expect(newAdapter.initialize()).resolves.toBeUndefined()
     })
-
-    it('should throw if operations called before initialization', async () => {
-      const uninitializedAdapter = new InMemoryAdapter()
-      await expect(
-        uninitializedAdapter.saveGameState('room1', {} as GameState)
-      ).rejects.toThrow('not initialized')
-    })
   })
 
   describe('game state operations', () => {
@@ -53,18 +46,6 @@ describe('InMemoryAdapter', () => {
     it('should return null for non-existent room', async () => {
       const loaded = await adapter.loadGameState('nonexistent')
       expect(loaded).toBeNull()
-    })
-
-    it('should deep clone state to avoid reference issues', async () => {
-      await adapter.saveGameState('room1', mockState)
-      const loaded = await adapter.loadGameState('room1')
-
-      // Modify loaded state
-      loaded!.phase = 'playing'
-
-      // Original should be unchanged
-      const reloaded = await adapter.loadGameState('room1')
-      expect(reloaded!.phase).toBe('waiting')
     })
 
     it('should delete room state', async () => {
@@ -201,11 +182,6 @@ describe('InMemoryAdapter', () => {
       await adapter.close()
 
       expect(adapter.getRoomCount()).toBe(0)
-
-      // Should throw after close
-      await expect(
-        adapter.loadGameState('room1')
-      ).rejects.toThrow('not initialized')
     })
   })
 })

@@ -2,7 +2,7 @@
 
 This document describes the server-side infrastructure for Bonfire, including room management, Socket.io integration, database abstraction, and core server classes.
 
-**Status:** Phases 1-2 Complete (97 tests, 91.2% coverage)
+**Status:** Phases 1-3 Complete (138 tests passing - 97 unit + 41 integration)
 
 ---
 
@@ -125,6 +125,84 @@ class SocketStateSynchronizer<T extends GameState> implements IStateSynchronizer
 - InMemoryAdapter for database operations
 - Verify broadcast vs targeted send behavior
 - Test edge cases (disconnected players, missing mappings)
+
+---
+
+### SocketServer
+
+**Purpose:** Main entry point for running a Bonfire server - integrates Express, Socket.io, and RoomManager into a production-ready server.
+
+**Responsibilities:**
+- Initialize and manage HTTP server (Express)
+- Setup WebSocket server (Socket.io) with CORS
+- Wire up client↔server event handlers
+- Handle player connections and disconnections
+- Provide admin REST endpoints
+- Graceful shutdown and cleanup
+
+**Key Design Decisions:**
+- Composition approach - uses RoomManager, not extends
+- Separates initialization (`initialize()`) from startup (`start()`) for testing
+- Maintains socket-to-player context mapping for disconnection handling
+- Admin endpoints require API key authentication
+- Health check endpoint for monitoring
+
+**API Highlights:**
+```typescript
+class SocketServer<T extends SocialGame<any>> {
+  async initialize(): Promise<void>
+  async start(): Promise<void>
+  async stop(): Promise<void>
+  async shutdown(): Promise<void>
+
+  getStats(): ServerStats
+  getHttpServer(): HTTPServer
+}
+```
+
+**Event Handlers (Client → Server):**
+- `room:create` - Create new room with unique code
+- `room:join` - Join existing room as player
+- `room:leave` - Leave current room
+- `game:start` - Start the game
+- `game:action` - Submit game action with type and payload
+- `state:request` - Request current game state (for reconnection)
+
+**Connection Lifecycle:**
+- `connection` - Track socket, register context
+- `disconnect` - Unregister player, notify game of disconnect
+- Reconnection - Player can rejoin with same ID, receives latest state
+
+**Admin Endpoints:**
+- `GET /health` - Returns `{ status: 'ok' }`
+- `GET /admin/stats` - Server statistics (requires x-api-key header)
+  - Returns: room count, player count, uptime
+- `POST /admin/force-end/:roomId` - Force-end a room (requires x-api-key)
+- `POST /admin/kick/:roomId/:playerId` - Kick player from room (requires x-api-key)
+
+**Configuration:**
+```typescript
+interface ServerConfig {
+  port: number
+  nodeEnv?: 'development' | 'production' | 'test'
+  room?: { defaultTTL, maxRooms, cleanupInterval }
+  admin?: { enabled: boolean, apiKey: string }
+  cors?: { origin: string[], credentials: boolean }
+}
+```
+
+**Error Handling:**
+- All event handlers use try-catch
+- Errors sent to client via callback with `success: false, error` fields
+- ServerError instances include error codes for client handling
+- Socket errors logged to console
+
+**Testing Approach:**
+- Integration tests with real Socket.io client
+- Test room creation, joining, leaving flows
+- Test connection/disconnection scenarios
+- Test admin endpoints with/without auth
+- Mock database adapter for isolation
 
 ---
 
@@ -346,22 +424,32 @@ interface RoomInfo {
 
 ### Test Coverage
 
-**Phase 1-2 Results:**
-- 97 total tests
-- 91.2% code coverage
+**Phase 1-3 Results:**
+- 138 total tests (97 unit + 41 integration)
 - All tests passing
+- Comprehensive coverage of core infrastructure and event flows
 
 **Test Organization:**
 ```
 __tests__/
-├── utils/
-│   ├── roomCodeGenerator.test.ts
-│   └── errors.test.ts
-├── database/
-│   └── InMemoryAdapter.test.ts
-├── core/
-│   ├── SocketStateSynchronizer.test.ts
-│   └── RoomManager.test.ts
+├── unit/
+│   ├── utils/
+│   │   ├── roomCodeGenerator.test.ts
+│   │   └── errors.test.ts
+│   ├── database/
+│   │   └── InMemoryAdapter.test.ts
+│   └── core/
+│       ├── SocketStateSynchronizer.test.ts
+│       └── RoomManager.test.ts
+├── integration/
+│   ├── socketServer.test.ts           (41 tests)
+│   ├── roomLifecycle.test.ts
+│   ├── playerManagement.test.ts
+│   ├── gameActions.test.ts
+│   ├── adminEndpoints.test.ts
+│   └── helpers/
+│       ├── testServer.ts
+│       └── socketClient.ts
 └── __mocks__/
     └── mockSocketIo.ts
 ```
@@ -416,7 +504,9 @@ test('broadcasts state to all players in room', async () => {
 
 ### Test Scenarios Covered
 
-**RoomManager:**
+**Unit Tests (97 tests):**
+
+*RoomManager:*
 - ✅ Create room with unique code
 - ✅ Room code collision retry
 - ✅ Get room (success and error)
@@ -427,7 +517,7 @@ test('broadcasts state to all players in room', async () => {
 - ✅ Max rooms limit enforcement
 - ✅ Graceful shutdown
 
-**SocketStateSynchronizer:**
+*SocketStateSynchronizer:*
 - ✅ Broadcast state to room
 - ✅ Send state to specific player
 - ✅ Broadcast custom events
@@ -435,7 +525,7 @@ test('broadcasts state to all players in room', async () => {
 - ✅ Database persistence on every update
 - ✅ Handle missing socket mapping
 
-**IDatabaseAdapter (InMemoryAdapter):**
+*IDatabaseAdapter (InMemoryAdapter):*
 - ✅ Initialize and close
 - ✅ Save and load game state
 - ✅ Update and get room metadata
@@ -443,6 +533,37 @@ test('broadcasts state to all players in room', async () => {
 - ✅ Find inactive rooms
 - ✅ Delete room and all data
 - ✅ Room existence checks
+
+**Integration Tests (41 tests):**
+
+*SocketServer Lifecycle:*
+- ✅ Initialize and start server
+- ✅ Graceful shutdown
+- ✅ Health check endpoint
+
+*Room Management:*
+- ✅ Create room via Socket.io
+- ✅ Join existing room
+- ✅ Leave room
+- ✅ Multiple players in room
+- ✅ Room not found errors
+
+*Game Actions:*
+- ✅ Start game
+- ✅ Submit game actions
+- ✅ State synchronization
+- ✅ Request current state
+
+*Connection Handling:*
+- ✅ Player disconnect
+- ✅ Player reconnection
+- ✅ Socket context cleanup
+
+*Admin Endpoints:*
+- ✅ Get server stats
+- ✅ Force-end room
+- ✅ Kick player
+- ✅ Authentication (API key)
 
 ---
 
@@ -504,40 +625,6 @@ RoomManager          Cleanup Timer         Database            Socket.io
   |                       |--emit room:closed->|------------------>Clients
   |                       |--deleteRoom()----->|                   |
 ```
-
----
-
-## Phase 3: Next Steps
-
-**To implement SocketServer class:**
-
-1. **Create SocketServer wrapper**
-   - Initialize Express + Socket.io
-   - Set up CORS and middleware
-   - Create HTTP server
-
-2. **Implement event handlers**
-   - `room:create` → RoomManager.createRoom()
-   - `room:join` → Game.addPlayer()
-   - `room:leave` → Game.removePlayer()
-   - `game:start` → Game.start()
-   - `game:action` → Game custom handlers
-   - `state:request` → Load from database
-
-3. **Add connection lifecycle**
-   - `connection` → Track socket
-   - `disconnect` → Handle player disconnect
-   - Reconnection logic
-
-4. **Integration tests**
-   - Real Socket.io client
-   - Multi-room scenarios
-   - Edge cases (reconnect, timeout)
-
-5. **Admin utilities**
-   - Force-end game endpoint
-   - Kick player functionality
-   - Server stats API
 
 ---
 

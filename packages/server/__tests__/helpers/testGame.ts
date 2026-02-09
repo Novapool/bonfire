@@ -40,6 +40,24 @@ export class TestGame extends SocialGame<TestGameState> {
   protected onEnd(): void {
     // No-op for test
   }
+
+  protected async onPlayerJoin(player: import('@bonfire/core').Player): Promise<void> {
+    // No-op for test
+  }
+
+  protected async onPlayerLeave(playerId: import('@bonfire/core').PlayerId): Promise<void> {
+    // No-op for test
+  }
+
+  protected async onGameStart(): Promise<void> {
+    // Change phase to 'playing' when game starts
+    this.state.phase = 'playing'
+  }
+
+  protected async onGameEnd(): Promise<void> {
+    // Change phase to 'ended' when game ends
+    this.state.phase = 'ended'
+  }
 }
 
 /**

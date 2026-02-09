@@ -6,15 +6,8 @@ import { describe, it, expect } from 'vitest'
 import {
   ServerError,
   RoomNotFoundError,
-  RoomFullError,
   UnauthorizedError,
   InvalidActionError,
-  RateLimitError,
-  PlayerNotFoundError,
-  DuplicatePlayerError,
-  GameStateError,
-  ConfigurationError,
-  DatabaseError,
 } from '../../src/utils/errors'
 
 describe('Error classes', () => {
@@ -60,17 +53,6 @@ describe('Error classes', () => {
     })
   })
 
-  describe('RoomFullError', () => {
-    it('should create error with room ID and max players', () => {
-      const error = new RoomFullError('ABC123', 8)
-      expect(error.message).toContain('ABC123')
-      expect(error.message).toContain('8')
-      expect(error.code).toBe('ROOM_FULL')
-      expect(error.statusCode).toBe(403)
-      expect(error.details).toEqual({ roomId: 'ABC123', maxPlayers: 8 })
-    })
-  })
-
   describe('UnauthorizedError', () => {
     it('should create error with default message', () => {
       const error = new UnauthorizedError()
@@ -96,87 +78,6 @@ describe('Error classes', () => {
       expect(error.details).toEqual({
         actionType: 'submit_answer',
         reason: 'Not your turn',
-      })
-    })
-  })
-
-  describe('RateLimitError', () => {
-    it('should create error with default message', () => {
-      const error = new RateLimitError()
-      expect(error.message).toContain('Rate limit')
-      expect(error.code).toBe('RATE_LIMIT_EXCEEDED')
-      expect(error.statusCode).toBe(429)
-    })
-
-    it('should include retry after time', () => {
-      const error = new RateLimitError(60000)
-      expect(error.details).toEqual({ retryAfter: 60000 })
-    })
-  })
-
-  describe('PlayerNotFoundError', () => {
-    it('should create error with player ID', () => {
-      const error = new PlayerNotFoundError('player123')
-      expect(error.message).toContain('player123')
-      expect(error.code).toBe('PLAYER_NOT_FOUND')
-      expect(error.statusCode).toBe(404)
-      expect(error.details).toEqual({ playerId: 'player123' })
-    })
-  })
-
-  describe('DuplicatePlayerError', () => {
-    it('should create error with player ID', () => {
-      const error = new DuplicatePlayerError('player123')
-      expect(error.message).toContain('player123')
-      expect(error.code).toBe('DUPLICATE_PLAYER')
-      expect(error.statusCode).toBe(409)
-      expect(error.details).toEqual({ playerId: 'player123' })
-    })
-  })
-
-  describe('GameStateError', () => {
-    it('should create error with phase information', () => {
-      const error = new GameStateError(
-        'Cannot start game',
-        'waiting',
-        'ready'
-      )
-      expect(error.message).toBe('Cannot start game')
-      expect(error.code).toBe('INVALID_GAME_STATE')
-      expect(error.statusCode).toBe(400)
-      expect(error.details).toEqual({
-        currentPhase: 'waiting',
-        expectedPhase: 'ready',
-      })
-    })
-  })
-
-  describe('ConfigurationError', () => {
-    it('should create error with message and details', () => {
-      const error = new ConfigurationError('Missing API key', {
-        required: 'FIREBASE_API_KEY',
-      })
-      expect(error.message).toBe('Missing API key')
-      expect(error.code).toBe('CONFIGURATION_ERROR')
-      expect(error.statusCode).toBe(500)
-      expect(error.details).toEqual({ required: 'FIREBASE_API_KEY' })
-    })
-  })
-
-  describe('DatabaseError', () => {
-    it('should create error with operation details', () => {
-      const originalError = new Error('Connection failed')
-      const error = new DatabaseError(
-        'Failed to save state',
-        'saveGameState',
-        originalError
-      )
-      expect(error.message).toBe('Failed to save state')
-      expect(error.code).toBe('DATABASE_ERROR')
-      expect(error.statusCode).toBe(500)
-      expect(error.details).toEqual({
-        operation: 'saveGameState',
-        originalError: 'Connection failed',
       })
     })
   })

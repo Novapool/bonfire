@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    fileParallelism: false, // Run integration tests sequentially
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

@@ -2,19 +2,22 @@
 
 Server infrastructure for Bonfire - multi-room orchestration, Socket.io integration, and database abstraction.
 
-**Status:** Phases 1-2 Complete (97 tests, 91.2% coverage)
+**Status:** Phases 1-3 Complete (138 tests passing - 97 unit + 41 integration)
 
 ---
 
 ## Package Overview
 
 This package provides the server-side infrastructure for running Bonfire games:
-- RoomManager for multi-room orchestration
-- SocketStateSynchronizer for realtime state broadcasting
-- IDatabaseAdapter interface for backend abstraction
+- **SocketServer** - Production-ready Express + Socket.io server
+- **RoomManager** - Multi-room orchestration and lifecycle management
+- **SocketStateSynchronizer** - Realtime state broadcasting via Socket.io + database
+- **IDatabaseAdapter** - Backend abstraction interface
+- **InMemoryAdapter** - In-memory implementation for testing
 - Type-safe Socket.io event contracts
 - Room code generation and validation
 - Custom error classes for server operations
+- Admin REST endpoints for server management
 
 ---
 
@@ -25,6 +28,7 @@ src/
 ├── index.ts                          - Package exports
 ├── types.ts                          - Server type definitions and Socket.io contracts
 ├── core/
+│   ├── SocketServer.ts               - Express + Socket.io server (NEW - Phase 3)
 │   ├── RoomManager.ts                - Multi-room orchestration and lifecycle
 │   └── SocketStateSynchronizer.ts    - Socket.io + database state broadcasting
 ├── database/
@@ -34,8 +38,21 @@ src/
     ├── roomCodeGenerator.ts          - 6-char room code generation
     └── errors.ts                     - Custom error classes
 
-__tests__/                            - Test files (mirrors src structure)
-__mocks__/                            - Mock Socket.io utilities for testing
+__tests__/
+├── unit/                             - Unit tests (97 tests)
+│   ├── utils/
+│   ├── database/
+│   └── core/
+├── integration/                      - Integration tests (41 tests, NEW - Phase 3)
+│   ├── socketServer.test.ts
+│   ├── roomLifecycle.test.ts
+│   ├── playerManagement.test.ts
+│   ├── gameActions.test.ts
+│   ├── adminEndpoints.test.ts
+│   └── helpers/
+│       ├── testServer.ts
+│       └── socketClient.ts
+└── __mocks__/                        - Mock Socket.io utilities for unit testing
 ```
 
 ---
@@ -120,13 +137,12 @@ Socket: disconnect → Server: Game.handlePlayerDisconnect() + RoomManager.untra
 
 ---
 
-## Next Steps (Phase 3)
+## Next Steps (Phase 4)
 
-1. Implement SocketServer class (Express + Socket.io wrapper)
-2. Wire up event handlers for room:create, room:join, game:action
-3. Add connection/disconnection handling
-4. Write integration tests with real Socket.io client
-5. Implement admin utilities (force-end, kick player)
+1. Implement FirebaseAdapter for IDatabaseAdapter
+2. Configure Firebase project and credentials
+3. Test with real Firebase Realtime Database
+4. Add Firebase setup and deployment documentation
 
 ---
 

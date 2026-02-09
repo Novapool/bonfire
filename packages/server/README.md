@@ -2,7 +2,7 @@
 
 Server infrastructure for Bonfire party game framework, providing multi-room orchestration, Socket.io integration, and database abstraction.
 
-**Status:** Phases 1-2 Complete (97 tests, 91.2% coverage)
+**Status:** Phases 1-3 Complete (138 tests passing - 97 unit + 41 integration)
 
 ---
 
@@ -32,6 +32,61 @@ npm install @bonfire/server
 ---
 
 ## Quick Start
+
+**Using SocketServer (Recommended - Phase 3+):**
+
+```typescript
+import { SocketServer, InMemoryAdapter } from '@bonfire/server'
+import { SocialGame } from '@bonfire/core'
+
+// Create database adapter
+const adapter = new InMemoryAdapter()
+
+// Create game factory
+const gameFactory = (roomId, synchronizer) => {
+  return new SocialGame({
+    roomId,
+    maxPlayers: 8,
+    stateSynchronizer: synchronizer,
+    // ... your game config
+  })
+}
+
+// Create and start server
+const server = new SocketServer(
+  {
+    port: 3000,
+    nodeEnv: 'development',
+    room: {
+      defaultTTL: 24 * 60 * 60 * 1000, // 24 hours
+      maxRooms: 1000,
+    },
+    admin: {
+      enabled: true,
+      apiKey: 'your-secret-key',
+    },
+    cors: {
+      origin: ['http://localhost:5173'],
+      credentials: true,
+    },
+  },
+  adapter,
+  gameFactory,
+  'my-game'
+)
+
+await server.initialize()
+await server.start()
+console.log('Server running on port 3000')
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  await server.shutdown()
+  process.exit(0)
+})
+```
+
+**Using RoomManager directly (Advanced - Phases 1-2):**
 
 ```typescript
 import { RoomManager, InMemoryAdapter } from '@bonfire/server'
@@ -84,6 +139,341 @@ httpServer.listen(3000, () => {
 ---
 
 ## API Reference
+
+### SocketServer
+
+**Main server class for Bonfire games** - integrates Express, Socket.io, and RoomManager into a production-ready multiplayer game server.
+
+#### Constructor
+
+```typescript
+constructor(
+  config: ServerConfig,
+  databaseAdapter: IDatabaseAdapter,
+  gameFactory: GameFactory<T>,
+  gameType: string
+)
+```
+
+**Parameters:**
+- `config` - Server configuration (port, CORS, admin, room settings)
+- `databaseAdapter` - Database adapter implementation (InMemoryAdapter or FirebaseAdapter)
+- `gameFactory` - Function to create game instances
+- `gameType` - String identifier for game type
+
+**Server Configuration:**
+```typescript
+interface ServerConfig {
+  port: number                          // HTTP server port
+  nodeEnv?: 'development' | 'production' | 'test'
+
+  room?: {
+    defaultTTL?: number                 // Room expiration (default: 24h)
+    maxRooms?: number                   // Max concurrent rooms (default: 1000)
+    cleanupInterval?: number            // Cleanup scan frequency (default: 1h)
+  }
+
+  admin?: {
+    enabled: boolean                    // Enable admin endpoints
+    apiKey: string                      // API key for authentication
+  }
+
+  cors?: {
+    origin: string[]                    // Allowed origins
+    credentials: boolean                // Allow credentials
+  }
+}
+```
+
+#### Lifecycle Methods
+
+##### `initialize(): Promise<void>`
+
+Initialize the server (Express, Socket.io, RoomManager, database adapter).
+
+```typescript
+await server.initialize()
+```
+
+**What it does:**
+- Initializes database adapter
+- Sets up Express app with CORS
+- Creates Socket.io server
+- Initializes RoomManager
+- Wires up event handlers
+- Starts room cleanup
+- Sets up admin endpoints (if enabled)
+
+---
+
+##### `start(): Promise<void>`
+
+Start the HTTP server on configured port.
+
+```typescript
+await server.start()
+// Server now listening on port
+```
+
+**Notes:**
+- Automatically calls `initialize()` if not already initialized
+- Returns promise that resolves when server is listening
+
+---
+
+##### `stop(): Promise<void>`
+
+Stop the HTTP server (but keep RoomManager running).
+
+```typescript
+await server.stop()
+```
+
+**Use case:** Restart server without losing room state
+
+---
+
+##### `shutdown(): Promise<void>`
+
+Gracefully shut down server and clean up all resources.
+
+```typescript
+await server.shutdown()
+```
+
+**What it does:**
+- Stops cleanup timers
+- Closes all Socket.io connections
+- Closes database adapter
+- Stops HTTP server
+
+---
+
+#### Utility Methods
+
+##### `getStats(): ServerStats`
+
+Get current server statistics.
+
+```typescript
+const stats = server.getStats()
+console.log(stats)
+// {
+//   roomCount: 5,
+//   playerCount: 12,
+//   uptime: 3600000 // milliseconds
+// }
+```
+
+**Returns:**
+```typescript
+interface ServerStats {
+  roomCount: number
+  playerCount: number
+  uptime: number
+}
+```
+
+---
+
+##### `getHttpServer(): HTTPServer`
+
+Get the underlying HTTP server instance.
+
+```typescript
+const httpServer = server.getHttpServer()
+```
+
+**Use case:** Access HTTP server for additional middleware or testing
+
+---
+
+#### Client Events
+
+**SocketServer handles these Socket.io events from clients:**
+
+##### `room:create`
+
+Create a new game room.
+
+```typescript
+socket.emit('room:create', gameType, hostName, (response) => {
+  if (response.success) {
+    console.log('Room created:', response.roomId)
+    console.log('Initial state:', response.state)
+  }
+})
+```
+
+**Parameters:**
+- `gameType: string` - Game type identifier
+- `hostName: string` - Host player's display name
+- `callback: (response: RoomCreateResponse) => void`
+
+**Response:**
+```typescript
+interface RoomCreateResponse {
+  success: boolean
+  roomId?: RoomId        // 6-character room code
+  playerId?: PlayerId    // Host player ID
+  state?: GameState      // Initial game state
+  error?: string
+}
+```
+
+---
+
+##### `room:join`
+
+Join an existing room.
+
+```typescript
+socket.emit('room:join', roomId, playerName, (response) => {
+  if (response.success) {
+    console.log('Joined room:', response.playerId)
+  }
+})
+```
+
+**Parameters:**
+- `roomId: RoomId` - 6-character room code
+- `playerName: string` - Player's display name
+- `callback: (response: RoomJoinResponse) => void`
+
+**Response:**
+```typescript
+interface RoomJoinResponse {
+  success: boolean
+  playerId?: PlayerId
+  state?: GameState
+  error?: string
+}
+```
+
+---
+
+##### `room:leave`
+
+Leave the current room.
+
+```typescript
+socket.emit('room:leave', (response) => {
+  if (response.success) {
+    console.log('Left room')
+  }
+})
+```
+
+---
+
+##### `game:start`
+
+Start the game (host only).
+
+```typescript
+socket.emit('game:start', (response) => {
+  if (response.success) {
+    console.log('Game started')
+  }
+})
+```
+
+---
+
+##### `game:action`
+
+Submit a game action.
+
+```typescript
+socket.emit('game:action', 'submit-answer', { answer: 'My answer' }, (response) => {
+  if (response.success) {
+    console.log('Action processed')
+  }
+})
+```
+
+**Parameters:**
+- `actionType: string` - Action identifier
+- `payload: unknown` - Action data
+- `callback: (response: ActionResponse) => void`
+
+---
+
+##### `state:request`
+
+Request current game state (for reconnection).
+
+```typescript
+socket.emit('state:request', (response) => {
+  if (response.success) {
+    console.log('Current state:', response.state)
+  }
+})
+```
+
+---
+
+#### Admin Endpoints
+
+**REST endpoints for server management (require API key):**
+
+##### `GET /health`
+
+Health check endpoint.
+
+```bash
+curl http://localhost:3000/health
+# { "status": "ok" }
+```
+
+---
+
+##### `GET /admin/stats`
+
+Get server statistics.
+
+```bash
+curl -H "x-api-key: your-secret-key" http://localhost:3000/admin/stats
+# {
+#   "roomCount": 5,
+#   "playerCount": 12,
+#   "uptime": 3600000
+# }
+```
+
+**Headers:**
+- `x-api-key: string` - Admin API key (required)
+
+---
+
+##### `POST /admin/force-end/:roomId`
+
+Force-end a room.
+
+```bash
+curl -X POST -H "x-api-key: your-secret-key" \
+  http://localhost:3000/admin/force-end/A3K7N2
+```
+
+**Params:**
+- `roomId: string` - Room to end
+
+---
+
+##### `POST /admin/kick/:roomId/:playerId`
+
+Kick a player from a room.
+
+```bash
+curl -X POST -H "x-api-key: your-secret-key" \
+  http://localhost:3000/admin/kick/A3K7N2/player-123
+```
+
+**Params:**
+- `roomId: string` - Room ID
+- `playerId: string` - Player to kick
+
+---
 
 ### RoomManager
 

@@ -5,6 +5,7 @@
  */
 
 // Core classes
+export { SocketServer } from './core/SocketServer'
 export { SocketStateSynchronizer } from './core/SocketStateSynchronizer'
 export { RoomManager } from './core/RoomManager'
 export type { RoomManagerConfig, GameFactory } from './core/RoomManager'

@@ -39,21 +39,6 @@ export class RoomNotFoundError extends ServerError {
 }
 
 /**
- * Room full error
- */
-export class RoomFullError extends ServerError {
-  constructor(roomId: string, maxPlayers: number) {
-    super(
-      `Room is full: ${roomId} (max ${maxPlayers} players)`,
-      'ROOM_FULL',
-      403,
-      { roomId, maxPlayers }
-    )
-    this.name = 'RoomFullError'
-  }
-}
-
-/**
  * Unauthorized error
  */
 export class UnauthorizedError extends ServerError {
@@ -75,83 +60,5 @@ export class InvalidActionError extends ServerError {
       { actionType, reason }
     )
     this.name = 'InvalidActionError'
-  }
-}
-
-/**
- * Rate limit exceeded error
- */
-export class RateLimitError extends ServerError {
-  constructor(retryAfter?: number) {
-    super(
-      'Rate limit exceeded. Please try again later.',
-      'RATE_LIMIT_EXCEEDED',
-      429,
-      { retryAfter }
-    )
-    this.name = 'RateLimitError'
-  }
-}
-
-/**
- * Player not found error
- */
-export class PlayerNotFoundError extends ServerError {
-  constructor(playerId: string) {
-    super(`Player not found: ${playerId}`, 'PLAYER_NOT_FOUND', 404, { playerId })
-    this.name = 'PlayerNotFoundError'
-  }
-}
-
-/**
- * Duplicate player error
- */
-export class DuplicatePlayerError extends ServerError {
-  constructor(playerId: string) {
-    super(`Player already in room: ${playerId}`, 'DUPLICATE_PLAYER', 409, { playerId })
-    this.name = 'DuplicatePlayerError'
-  }
-}
-
-/**
- * Game state error
- */
-export class GameStateError extends ServerError {
-  constructor(message: string, currentPhase: string, expectedPhase?: string) {
-    super(
-      message,
-      'INVALID_GAME_STATE',
-      400,
-      { currentPhase, expectedPhase }
-    )
-    this.name = 'GameStateError'
-  }
-}
-
-/**
- * Configuration error
- */
-export class ConfigurationError extends ServerError {
-  constructor(message: string, details?: Record<string, unknown>) {
-    super(message, 'CONFIGURATION_ERROR', 500, details)
-    this.name = 'ConfigurationError'
-  }
-}
-
-/**
- * Database error
- */
-export class DatabaseError extends ServerError {
-  constructor(message: string, operation: string, originalError?: Error) {
-    super(
-      message,
-      'DATABASE_ERROR',
-      500,
-      {
-        operation,
-        originalError: originalError?.message,
-      }
-    )
-    this.name = 'DatabaseError'
   }
 }

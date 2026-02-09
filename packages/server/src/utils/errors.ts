@@ -62,3 +62,78 @@ export class InvalidActionError extends ServerError {
     this.name = 'InvalidActionError'
   }
 }
+
+/**
+ * Room full error
+ */
+export class RoomFullError extends ServerError {
+  constructor(roomId: string, maxPlayers: number) {
+    super(
+      `Room ${roomId} is full (max ${maxPlayers} players)`,
+      'ROOM_FULL',
+      400,
+      { roomId, maxPlayers }
+    )
+    this.name = 'RoomFullError'
+  }
+}
+
+/**
+ * Rate limit error
+ */
+export class RateLimitError extends ServerError {
+  constructor(message: string = 'Too many requests') {
+    super(message, 'RATE_LIMIT_EXCEEDED', 429)
+    this.name = 'RateLimitError'
+  }
+}
+
+/**
+ * Player not found error
+ */
+export class PlayerNotFoundError extends ServerError {
+  constructor(playerId: string) {
+    super(`Player not found: ${playerId}`, 'PLAYER_NOT_FOUND', 404, { playerId })
+    this.name = 'PlayerNotFoundError'
+  }
+}
+
+/**
+ * Duplicate player error
+ */
+export class DuplicatePlayerError extends ServerError {
+  constructor(playerId: string) {
+    super(`Player already exists: ${playerId}`, 'DUPLICATE_PLAYER', 409, { playerId })
+    this.name = 'DuplicatePlayerError'
+  }
+}
+
+/**
+ * Game state error
+ */
+export class GameStateError extends ServerError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super(message, 'GAME_STATE_ERROR', 400, details)
+    this.name = 'GameStateError'
+  }
+}
+
+/**
+ * Configuration error
+ */
+export class ConfigurationError extends ServerError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super(message, 'CONFIGURATION_ERROR', 500, details)
+    this.name = 'ConfigurationError'
+  }
+}
+
+/**
+ * Database error
+ */
+export class DatabaseError extends ServerError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super(message, 'DATABASE_ERROR', 500, details)
+    this.name = 'DatabaseError'
+  }
+}

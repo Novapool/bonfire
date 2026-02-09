@@ -5,7 +5,8 @@ An open-source TypeScript framework for building social party games - "Rails for
 ## Current Status
 Milestone 1: Foundation & Architecture ✅ Complete (Feb 8, 2026)
 Milestone 2: Core Game Engine ✅ Complete (Feb 8, 2026)
-**Current:** Milestone 3: Server Infrastructure 🟡 In Progress (Phases 1-3 Complete, Phase 4 Next)
+Milestone 3: Server Infrastructure ✅ Complete (Feb 8, 2026)
+**Next:** Milestone 4: Client Library 🔵 (React hooks and utilities)
 
 ## Documentation
 
@@ -26,12 +27,12 @@ Milestone 2: Core Game Engine ✅ Complete (Feb 8, 2026)
   - `server-infrastructure.md` - Server classes (SocketServer, RoomManager, SocketStateSynchronizer, adapters)
 
 - `docs/api/` - API integration and endpoint documentation
-  - Read when: Setting up admin endpoints, managing servers in production
+  - Read when: Setting up databases, deploying servers, managing production
+  - `FIREBASE.md` - Complete Firebase setup guide (local dev with emulator, production deployment)
   - `ADMIN_API.md` - Admin REST endpoints (stats, force-end, kick player)
 
 **Future documentation (create as needed):**
 - `docs/SETUP.md` - Local development setup instructions
-- `docs/api/FIREBASE.md` - Firebase integration guide (Phase 4)
 
 ## Project Structure
 

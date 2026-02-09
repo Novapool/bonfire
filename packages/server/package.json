@@ -8,7 +8,10 @@
     "build": "tsc",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "lint": "echo \"Linting coming soon\""
+    "lint": "echo \"Linting coming soon\"",
+    "firebase:emulator": "firebase emulators:start --only database",
+    "firebase:emulator:ui": "firebase emulators:start --only database",
+    "test:firebase": "firebase emulators:exec --only database 'vitest __tests__/unit/database/FirebaseAdapter.test.ts'"
   },
   "keywords": [
     "party-games",

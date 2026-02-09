@@ -12,7 +12,9 @@ export type { RoomManagerConfig, GameFactory } from './core/RoomManager'
 
 // Database adapters
 export { InMemoryAdapter } from './database/InMemoryAdapter'
+export { FirebaseAdapter } from './database/FirebaseAdapter'
 export type { IDatabaseAdapter, DatabaseAdapterOptions } from './database/IDatabaseAdapter'
+export type { FirebaseAdapterConfig } from './database/FirebaseAdapter'
 
 // Utilities
 export {

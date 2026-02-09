@@ -2,7 +2,7 @@
 
 This document describes the server-side infrastructure for Bonfire, including room management, Socket.io integration, database abstraction, and core server classes.
 
-**Status:** Phases 1-3 Complete (138 tests passing - 97 unit + 41 integration)
+**Status:** ✅ Milestone 3 Complete - All 4 Phases Done! (Firebase integration ready)
 
 ---
 
@@ -243,10 +243,12 @@ interface IDatabaseAdapter {
    - No persistence - data lost on restart
    - Perfect for unit tests
 
-2. **FirebaseAdapter** (Phase 4, planned)
+2. **FirebaseAdapter** (Phase 4, ✅ implemented)
    - Firebase Realtime Database integration
    - Automatic persistence and syncing
-   - Handles Firebase SDK initialization
+   - Firebase SDK initialization with credentials or emulator
+   - Local development with Firebase Emulator (zero setup!)
+   - Production deployment with service account authentication
 
 3. **PostgresAdapter** (Future)
    - Railway + PostgreSQL
@@ -628,18 +630,139 @@ RoomManager          Cleanup Timer         Database            Socket.io
 
 ---
 
-## Phase 4: Firebase Integration
+## FirebaseAdapter Implementation
 
-**To implement FirebaseAdapter:**
+**Purpose:** Production-ready database adapter using Firebase Realtime Database.
 
-1. Firebase SDK setup and initialization
-2. Map interface methods to Firebase operations:
-   - `saveGameState()` → `.set()` to `/rooms/{roomId}/state`
-   - `loadGameState()` → `.once('value')` from `/rooms/{roomId}/state`
-   - `updateRoomMetadata()` → `.set()` to `/rooms/{roomId}/metadata`
-   - `getInactiveRooms()` → `.orderByChild('lastActivity').endAt(threshold)`
-3. Test with real Firebase instance
-4. Add configuration and setup docs
+**Implementation:** `packages/server/src/database/FirebaseAdapter.ts`
+
+**Key Features:**
+- Firebase SDK initialization with multiple credential options:
+  - Service account file path (`FIREBASE_CREDENTIALS_PATH`)
+  - Service account object (direct configuration)
+  - Application Default Credentials (for GCP deployment)
+  - Firebase Emulator (for local development)
+- Automatic duplicate app detection (prevents initialization errors)
+- Environment-based configuration (seamlessly switches between emulator and production)
+- Comprehensive error handling with typed errors
+
+**Configuration:**
+```typescript
+interface FirebaseAdapterConfig {
+  projectId: string
+  databaseURL: string
+  credentialsPath?: string              // Path to service account JSON
+  credentials?: admin.ServiceAccount    // Direct credentials object
+  useEmulator?: boolean                 // Auto-detected or explicit
+}
+```
+
+**Database Operations:**
+
+*Game State:*
+- `saveGameState()` → `ref('/rooms/{roomId}/state').set(state)`
+- `loadGameState()` → `ref('/rooms/{roomId}/state').once('value')`
+
+*Room Metadata:*
+- `updateRoomMetadata()` → `ref('/rooms/{roomId}/metadata').set(metadata)`
+- `getRoomMetadata()` → `ref('/rooms/{roomId}/metadata').once('value')`
+- `getAllRoomMetadata()` → `ref('/rooms').once('value')` (reads all metadata)
+
+*Cleanup Operations:*
+- `getInactiveRooms()` → `ref('/rooms').orderByChild('metadata/lastActivity').endAt(threshold)`
+- `deleteRoom()` → `ref('/rooms/{roomId}').remove()`
+- `roomExists()` → `ref('/rooms/{roomId}').once('value')` (checks existence)
+
+**Local Development:**
+- Firebase Emulator runs on `localhost:9000` (database) and `localhost:4000` (UI)
+- No Firebase account or credentials needed
+- Configured via `firebase.json` and `database.rules.json`
+- Start with: `npm run firebase:emulator`
+
+**Production Setup:**
+- Service account credentials from Firebase Console
+- Environment variables for configuration
+- Supports multiple deployment platforms (Heroku, Railway, Render, GCP)
+- Complete setup guide: `docs/api/FIREBASE.md`
+
+**Testing:**
+- 30+ tests covering all adapter operations
+- Requires Firebase emulator to be running
+- Tests use emulator-specific database URL
+- Full isolation between test runs
+
+---
+
+## Database Schema
+
+### Firebase Realtime Database Structure
+
+```
+/rooms/
+  /{roomId}/              # 6-character room code (e.g., "A3K9M2")
+    /state                # Game state (synchronized to clients)
+      phase: "waiting" | "playing" | "finished"
+      players: {
+        [playerId]: {
+          id: string
+          name: string
+          isHost: boolean
+          isConnected: boolean
+          ...custom player data
+        }
+      }
+      custom: {
+        ...game-specific state (scores, rounds, etc.)
+      }
+
+    /metadata             # Room tracking data (not sent to clients)
+      roomId: string
+      createdAt: number   # Unix timestamp
+      lastActivity: number  # Unix timestamp (indexed for cleanup queries)
+      hostId: string
+      playerCount: number
+      status: "waiting" | "playing" | "finished"
+      gameType: string    # e.g., "intimacy-ladder"
+```
+
+**Design Decisions:**
+
+*Separation of State and Metadata:*
+- `/state` contains game data synchronized to clients
+- `/metadata` contains server tracking data (never sent to clients)
+- Enables efficient queries without loading full game state
+
+*Indexed Fields:*
+- `metadata/lastActivity` indexed for cleanup queries
+- Enables efficient `getInactiveRooms()` without scanning all rooms
+
+*Room ID as Key:*
+- 6-character codes used as database keys
+- Simple lookups: `ref('/rooms/{roomId}')`
+- No need for separate ID mapping
+
+*Timestamp-based Cleanup:*
+- `lastActivity` updated on every player action
+- Cleanup queries: `orderByChild('metadata/lastActivity').endAt(threshold)`
+- Automatic deletion of inactive rooms via TTL
+
+**Security Rules (Development):**
+```json
+{
+  "rules": {
+    "rooms": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
+```
+
+**Production Security (Future):**
+- Restrict reads to room participants only
+- Validate writes via server-side admin SDK
+- Rate limiting on room creation
+- Player authentication tokens
 
 ---
 

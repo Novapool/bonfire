@@ -2,7 +2,7 @@
 
 Server infrastructure for Bonfire party game framework, providing multi-room orchestration, Socket.io integration, and database abstraction.
 
-**Status:** Phases 1-3 Complete (138 tests passing - 97 unit + 41 integration)
+**Status:** Milestone 3 Complete - All 4 phases done! (Tests require Firebase emulator)
 
 ---
 
@@ -955,6 +955,91 @@ const roomManager = new RoomManager(io, adapter, gameFactory, 'my-game')
 
 ---
 
+### FirebaseAdapter
+
+Firebase Realtime Database adapter for production persistence.
+
+#### Constructor
+
+```typescript
+constructor(config: FirebaseAdapterConfig)
+```
+
+**Configuration:**
+```typescript
+interface FirebaseAdapterConfig {
+  projectId: string        // Firebase project ID
+  databaseURL: string      // Firebase Realtime Database URL
+  credentialsPath?: string // Path to service account JSON
+  credentials?: object     // Service account object
+  useEmulator?: boolean    // Use Firebase emulator (local dev)
+}
+```
+
+#### Usage
+
+**Production (with credentials file):**
+```typescript
+import { FirebaseAdapter } from '@bonfire/server'
+
+const adapter = new FirebaseAdapter({
+  projectId: process.env.FIREBASE_PROJECT_ID!,
+  databaseURL: process.env.FIREBASE_DATABASE_URL!,
+  credentialsPath: '/path/to/firebase-service-account.json',
+})
+
+await adapter.initialize()
+
+// Use with SocketServer
+const server = new SocketServer({
+  port: 3000,
+  databaseAdapter: adapter,
+  gameFactory: () => new SocialGame(),
+  // ... other config
+})
+```
+
+**Local Development (with emulator):**
+```typescript
+const adapter = new FirebaseAdapter({
+  projectId: 'bonfire-dev',
+  databaseURL: 'http://localhost:9000?ns=bonfire-dev',
+  useEmulator: true, // Connects to Firebase Emulator
+})
+
+await adapter.initialize()
+```
+
+**Features:**
+- ✅ Production-ready persistence
+- ✅ Automatic data synchronization
+- ✅ Firebase Emulator support for local development
+- ✅ No credentials needed for emulator
+- ✅ Real-time data updates
+- ✅ Scalable for production use
+
+**Setup:**
+1. **Local Development:**
+   - Install Firebase CLI: `npm install -g firebase-tools`
+   - Start emulator: `firebase emulators:start --only database`
+   - No Firebase account required!
+
+2. **Production:**
+   - Create Firebase project at https://console.firebase.google.com
+   - Enable Realtime Database
+   - Download service account credentials
+   - See `docs/api/FIREBASE.md` for complete setup guide
+
+**Database Structure:**
+```
+/rooms/
+  /{roomId}/
+    /state - Game state object
+    /metadata - Room metadata
+```
+
+---
+
 ## Types
 
 ### Server Configuration
@@ -1270,11 +1355,11 @@ See `docs/architecture/server-infrastructure.md` for detailed architecture docum
 **Phase 2: Room Management Core** ✅ Complete
 - RoomManager, SocketStateSynchronizer, mock Socket.io utilities, 97 tests
 
-**Phase 3: Socket.io Integration** 🔵 Next
-- SocketServer class, event handlers, integration tests
+**Phase 3: Socket.io Integration** ✅ Complete
+- SocketServer class, event handlers, integration tests, 41 integration tests
 
-**Phase 4: Firebase Integration** 🔴 Future
-- FirebaseAdapter implementation
+**Phase 4: Firebase Integration** ✅ Complete
+- FirebaseAdapter implementation, emulator setup, production deployment guide
 
 ---
 

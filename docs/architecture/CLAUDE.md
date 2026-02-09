@@ -10,10 +10,12 @@ This directory contains architectural documentation for the Bonfire framework.
 - **server-infrastructure.md** - Server class architecture (RoomManager, SocketStateSynchronizer, database adapters, database schema)
   - Read when: Understanding server design, implementing Socket.io integration, working with database adapters, understanding Firebase/PostgreSQL schema, debugging server issues
 
+- **client-library.md** - Client library architecture (BonfireClient, BonfireProvider, React hooks)
+  - Read when: Understanding client hooks, building game UIs, working with state subscriptions, debugging client-server communication
+
 ## Future Documentation
 
 As the project grows, additional architecture documentation will be added here:
 
 - **state-machine.md** - Phase management and state transitions (when complex phase logic is added)
-- **client-hooks.md** - React hooks architecture and state management (Milestone 4)
 - **scalability.md** - Performance considerations and optimization strategies (post-MVP)

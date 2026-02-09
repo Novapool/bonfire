@@ -191,21 +191,48 @@
 
 ---
 
-## Milestone 4: Client Library 🔴
+## Milestone 4: Client Library 🟢
 
 **Goal:** Create React hooks and utilities for game UIs
 
-### Tasks
-- [ ] 🔴 Build `useGameState` hook for state synchronization
-- [ ] 🔴 Create `usePlayer` hook for player-specific data
-- [ ] 🔴 Implement `useRoom` hook for room management
-- [ ] 🔴 Add `usePhase` hook for phase-based rendering
-- [ ] 🔴 Build connection status indicator
-- [ ] 🔴 Handle optimistic updates and conflict resolution
-- [ ] 🔴 Create error boundary components
-- [ ] 🔴 Write integration tests with mock server
+**Status:** ✅ Complete
 
-**Deliverable:** React hooks that make building game UIs trivial
+**Completed:** February 9, 2026
+
+### Tasks
+- [x] 🟢 Build `useGameState` hook for state synchronization
+- [x] 🟢 Create `usePlayer` hook for player-specific data
+- [x] 🟢 Implement `useRoom` hook for room management
+- [x] 🟢 Add `usePhase` hook for phase-based rendering
+- [x] 🟢 Build connection status indicator (`useConnection` hook)
+- [x] 🟢 Handle optimistic updates and conflict resolution (server-authoritative model; optimistic patterns deferred to Milestone 7)
+- [x] 🟢 Create error boundary components (`BonfireErrorBoundary`)
+- [x] 🟢 Write unit tests with mock client (55 tests, 90.81% coverage)
+
+**Deliverable:** ✅ React hooks that make building game UIs trivial
+
+**What Was Built:**
+- **BonfireClient class** - Socket.io wrapper with Promise-based API, subscription model, and internal state tracking
+  - Promise wrappers: `createRoom()`, `joinRoom()`, `leaveRoom()`, `startGame()`, `sendAction()`, `requestState()`
+  - Subscription API: `onStateChange()`, `onStatusChange()`, `onError()`, `onGameEvent()`, `onRoomClosed()`
+  - Typed socket events matching server's `ClientToServerEvents`/`ServerToClientEvents` contracts
+- **BonfireProvider** - React context provider accepting pre-created client or config
+  - Auto-connect on mount, cleanup on unmount
+  - Subscribes to client state/status for reactive rendering
+- **6 React hooks:**
+  - `useGameState<TState>()` - `useSyncExternalStore`-based state subscription with generic type support
+  - `useConnection()` - Connection status tracking with `connect()`/`disconnect()` controls
+  - `useRoom()` - Room management (create, join, leave, start) and `sendAction()`
+  - `usePlayer()` - Derives current player, isHost, and player list from state
+  - `usePhase()` - Current phase with `isPhase()` helper for conditional rendering
+  - `useBonfireEvent()` - Typed game event subscription with auto-cleanup
+- **BonfireErrorBoundary** - Error boundary component with static/render-function fallback and reset
+- **55 tests, 90.81% coverage** - All hooks at 100% coverage, BonfireClient at 97.4%
+- **Client types** - Duplicated server response types to avoid server package dependency
+
+**Architecture Documentation:** See `docs/architecture/client-library.md` for detailed design.
+
+**Time to Complete:** ~2 hours focused development
 
 ---
 
@@ -400,11 +427,11 @@
 
 ## Progress Tracking
 
-**Overall Progress:** 3/13 milestones complete (23.1%)
+**Overall Progress:** 4/13 milestones complete (30.8%)
 
-**Current Focus:** Milestone 4 - Client Library (Next)
+**Current Focus:** Milestone 5 - UI Component Library (Next)
 
-**Last Updated:** February 8, 2026
+**Last Updated:** February 9, 2026
 
 ---
 
@@ -425,4 +452,8 @@
 - **Milestone 3:** RoomManager handles TTL cleanup via intervals - important to clear intervals on shutdown to prevent memory leaks.
 - **Milestone 3 (Feb 8, 2026):** FirebaseAdapter uses emulator detection for seamless local→production transitions without code changes.
 - **Milestone 3:** Firebase Emulator enables zero-setup local development - no Firebase account or credentials needed for testing!
+- **Milestone 4 (Feb 9, 2026):** `useSyncExternalStore` is the correct React 18 pattern for subscribing to external stores (BonfireClient) — prevents tearing in concurrent mode.
+- **Milestone 4:** Duplicating server response types in the client avoids pulling in Node.js-only server deps (Express, firebase-admin) — clean client/server boundary.
+- **Milestone 4:** MockBonfireClient with `simulate*` methods mirrors the real client's subscription API, enabling fast hook unit tests without sockets.
+- **Milestone 4:** Server-authoritative model (no client-side optimistic update machinery) is sufficient for turn-based social games. Can revisit in Milestone 7 if needed.
 

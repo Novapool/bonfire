@@ -6,7 +6,8 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Tests coming soon\"",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "lint": "echo \"Linting coming soon\""
   },
   "keywords": [
@@ -19,9 +20,20 @@
   "author": "Laith Assaf",
   "license": "MIT",
   "dependencies": {
-    "@bonfire/core": "0.1.0"
+    "@bonfire/core": "0.1.0",
+    "socket.io-client": "^4.8.3"
   },
   "peerDependencies": {
     "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@types/react": "^18.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "jsdom": "^24.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "vitest": "^2.1.0"
   }
 }

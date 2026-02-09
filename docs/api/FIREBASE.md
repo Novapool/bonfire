@@ -4,6 +4,28 @@ This guide covers setting up Firebase Realtime Database for Bonfire server infra
 
 ---
 
+## Quick Start
+
+**Test your Firebase connection (production):**
+```bash
+cd packages/server
+npm run firebase:test
+```
+
+**Start Firebase emulator (local development):**
+```bash
+cd packages/server
+npm run firebase:emulator
+```
+
+**Run tests with emulator:**
+```bash
+cd packages/server
+npm run test:firebase
+```
+
+---
+
 ## Overview
 
 Bonfire uses Firebase Realtime Database for:
@@ -82,11 +104,13 @@ Bonfire uses Firebase Realtime Database for:
 ### Running Tests with Emulator
 
 ```bash
+cd packages/server
+
 # Terminal 1: Start emulator
-firebase emulators:start --only database
+npm run firebase:emulator
 
 # Terminal 2: Run tests
-npm test
+npm run test:firebase
 ```
 
 Tests automatically connect to emulator when `FIREBASE_EMULATOR_HOST` is set.
@@ -254,6 +278,34 @@ const adapter = new FirebaseAdapter({
 
 3. **Publish Rules:**
    - Click "Publish" to apply changes
+
+### Step 6: Test Your Connection
+
+Verify your Firebase setup is working correctly:
+
+```bash
+cd packages/server
+npm run firebase:test
+```
+
+This will:
+- ✓ Verify your credentials are valid
+- ✓ Create a test room in Firebase
+- ✓ Read the room data back
+- ✓ Delete the test room
+- ✓ Confirm everything is working
+
+**Expected output:**
+```
+🔥 Testing Firebase connection...
+✓ FirebaseAdapter created
+✓ Firebase initialized successfully
+✓ Test room created: TEST01
+✓ Test room state retrieved
+✓ Test room metadata retrieved
+✓ Test room deleted
+🎉 Firebase connection test successful!
+```
 
 ---
 
@@ -503,6 +555,58 @@ await adapter.initialize()
 - **Phase 5:** PostgreSQL adapter for Railway deployment
 - **Phase 6:** Redis adapter for high-performance caching
 - **Advanced:** Multi-region Firebase setup for global deployment
+
+---
+
+## Common Commands Reference
+
+All commands should be run from `packages/server/` directory:
+
+```bash
+cd packages/server
+```
+
+### Testing & Development
+
+```bash
+# Test Firebase connection (production)
+npm run firebase:test
+
+# Start Firebase emulator (local development)
+npm run firebase:emulator
+
+# Run unit tests with emulator
+npm run test:firebase
+
+# Run all tests
+npm test
+```
+
+### Deployment
+
+```bash
+# Deploy database security rules to production
+firebase deploy --only database
+
+# Build TypeScript
+npm run build
+```
+
+### Firebase CLI
+
+```bash
+# Login to Firebase
+firebase login
+
+# List your projects
+firebase projects:list
+
+# Switch active project
+firebase use <project-id>
+
+# Open Firebase console
+firebase open
+```
 
 ---
 

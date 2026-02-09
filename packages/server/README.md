@@ -1021,13 +1021,14 @@ await adapter.initialize()
 **Setup:**
 1. **Local Development:**
    - Install Firebase CLI: `npm install -g firebase-tools`
-   - Start emulator: `firebase emulators:start --only database`
+   - Start emulator: `npm run firebase:emulator`
    - No Firebase account required!
 
 2. **Production:**
    - Create Firebase project at https://console.firebase.google.com
    - Enable Realtime Database
    - Download service account credentials
+   - Test connection: `npm run firebase:test`
    - See `docs/api/FIREBASE.md` for complete setup guide
 
 **Database Structure:**
@@ -1203,11 +1204,26 @@ ServerError (extends Error)
 ### Running Tests
 
 ```bash
-# Run tests
+# Run all tests (unit + integration)
 npm test
 
 # Run with coverage
 npm run test:coverage
+
+# Test Firebase connection (production)
+npm run firebase:test
+
+# Run Firebase unit tests with emulator
+npm run test:firebase
+```
+
+**Note:** Firebase tests require the emulator to be running:
+```bash
+# Terminal 1: Start emulator
+npm run firebase:emulator
+
+# Terminal 2: Run tests
+npm run test:firebase
 ```
 
 ### Mock Socket.io Utilities

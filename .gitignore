@@ -43,3 +43,9 @@ Thumbs.db
 # Package manager
 .yarn/
 .pnpm-store/
+
+# Firebase credentials
+packages/server/credentials/
+*.json
+!firebase.json
+!database.rules.json

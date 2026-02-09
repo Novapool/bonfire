@@ -11,6 +11,7 @@
     "lint": "echo \"Linting coming soon\"",
     "firebase:emulator": "firebase emulators:start --only database",
     "firebase:emulator:ui": "firebase emulators:start --only database",
+    "firebase:test": "npx tsx test-firebase.ts",
     "test:firebase": "firebase emulators:exec --only database 'vitest __tests__/unit/database/FirebaseAdapter.test.ts'"
   },
   "keywords": [
@@ -23,6 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "@bonfire/core": "0.1.0",
+    "dotenv": "^17.2.4",
     "express": "^4.18.0",
     "firebase-admin": "^12.0.0",
     "socket.io": "^4.7.0"

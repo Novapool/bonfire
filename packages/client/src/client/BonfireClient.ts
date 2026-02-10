@@ -237,11 +237,6 @@ export class BonfireClient {
       if (listeners) {
         listeners.forEach((l) => l(event.payload));
       }
-      // Wildcard listeners receive the full event
-      const wildcardListeners = this.eventListeners.get('*');
-      if (wildcardListeners) {
-        wildcardListeners.forEach((l) => l(event));
-      }
     });
 
     this.socket.on('error', (error: ErrorResponse) => {

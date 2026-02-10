@@ -7,6 +7,9 @@
 // Core types
 export * from './types';
 
+// API contracts (shared with client/server)
+export * from './contracts';
+
 // Base classes
 export * from './Game';
 export * from './SocialGame';

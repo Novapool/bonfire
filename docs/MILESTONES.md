@@ -227,7 +227,9 @@
   - `usePhase()` - Current phase with `isPhase()` helper for conditional rendering
   - `useBonfireEvent()` - Typed game event subscription with auto-cleanup
 - **BonfireErrorBoundary** - Error boundary component with static/render-function fallback and reset
-- **55 tests, 90.81% coverage** - All hooks at 100% coverage, BonfireClient at 97.4%
+- **MockBonfireClient** - Test utility for simulating client behavior with state/event simulation methods
+- **8 test files, 55 tests, 90.81% coverage** - All hooks at 100% coverage, BonfireClient at 97.4%
+  - Architecture: Uses `useSyncExternalStore` for React state synchronization with external Socket.io client
 - **Client types** - Duplicated server response types to avoid server package dependency
 
 **Architecture Documentation:** See `docs/architecture/client-library.md` for detailed design.

@@ -4,7 +4,19 @@
 
 import type { Server as SocketIOServer, Socket } from 'socket.io'
 import type { Server as HTTPServer } from 'http'
-import type { SocialGame, GameState, RoomId, PlayerId, RoomStatus } from '@bonfire/core'
+import type {
+  SocialGame,
+  GameState,
+  RoomId,
+  PlayerId,
+  RoomStatus,
+  BaseResponse,
+  RoomCreateResponse,
+  RoomJoinResponse,
+  StateResponse,
+  ActionResponse,
+  ErrorResponse,
+} from '@bonfire/core'
 import type { SocketStateSynchronizer } from './core/SocketStateSynchronizer'
 
 /**
@@ -178,52 +190,15 @@ export interface ServerToClientEvents {
   'room:closed': (reason: string) => void
 }
 
-/**
- * Base response structure
- */
-export interface BaseResponse {
-  success: boolean
-  error?: string
-  code?: string
-}
-
-/**
- * Room creation response
- */
-export interface RoomCreateResponse extends BaseResponse {
-  roomId?: RoomId
-  state?: GameState
-}
-
-/**
- * Room join response
- */
-export interface RoomJoinResponse extends BaseResponse {
-  state?: GameState
-  playerId?: PlayerId
-}
-
-/**
- * State request response
- */
-export interface StateResponse extends BaseResponse {
-  state?: GameState
-}
-
-/**
- * Action response
- */
-export interface ActionResponse extends BaseResponse {
-  data?: unknown
-}
-
-/**
- * Error response
- */
-export interface ErrorResponse {
-  message: string
-  code: string
-  details?: Record<string, unknown>
+// Response types are now imported from @bonfire/core (see contracts.ts)
+// Re-export for backwards compatibility
+export type {
+  BaseResponse,
+  RoomCreateResponse,
+  RoomJoinResponse,
+  StateResponse,
+  ActionResponse,
+  ErrorResponse,
 }
 
 /**

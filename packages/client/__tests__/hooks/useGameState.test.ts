@@ -28,13 +28,13 @@ describe('useGameState', () => {
     expect(result.current.state).toEqual(state);
   });
 
-  it('should support generic type narrowing', () => {
+  it('should support custom state fields via type assertion', () => {
     interface MyState extends GameState {
       customField: string;
     }
 
     const client = new MockBonfireClient();
-    const { result } = renderWithProvider(() => useGameState<MyState>(), client);
+    const { result } = renderWithProvider(() => useGameState(), client);
 
     const state = {
       roomId: 'ABC123',
@@ -47,7 +47,8 @@ describe('useGameState', () => {
       client.simulateStateUpdate(state);
     });
 
-    expect(result.current.state?.customField).toBe('hello');
+    const myState = result.current.state as MyState;
+    expect(myState?.customField).toBe('hello');
   });
 
   it('should call requestState on the client', async () => {

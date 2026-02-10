@@ -61,57 +61,51 @@ export class FirebaseAdapter implements IDatabaseAdapter {
   }
 
   async initialize(): Promise<void> {
-    try {
-      // For emulator mode, set environment variable before initialization
-      if (this.config.useEmulator && !process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
-        const emulatorHost = process.env.FIREBASE_EMULATOR_HOST || 'localhost:9000'
+    // For emulator mode, set environment variable upfront
+    if (this.config.useEmulator) {
+      const emulatorHost = process.env.FIREBASE_EMULATOR_HOST || 'localhost:9000'
+      if (!process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
         process.env.FIREBASE_DATABASE_EMULATOR_HOST = emulatorHost
       }
-
-      // Check if app already exists (avoid duplicate initialization)
-      let isNewApp = false
-      try {
-        this.app = admin.app('[DEFAULT]')
-      } catch {
-        // App doesn't exist, create it
-        isNewApp = true
-        const appConfig: admin.AppOptions = {
-          projectId: this.config.projectId,
-          databaseURL: this.config.databaseURL,
-        }
-
-        // Add credentials based on mode
-        if (this.config.credentials) {
-          appConfig.credential = admin.credential.cert(this.config.credentials)
-        } else if (this.config.credentialsPath) {
-          appConfig.credential = admin.credential.cert(this.config.credentialsPath)
-        } else if (this.config.useEmulator) {
-          // For emulator, skip credential validation by not setting credential
-          // The emulator will handle auth automatically via environment variable
-          // No credential needed - will use emulator
-        } else {
-          // Use Application Default Credentials for production
-          appConfig.credential = admin.credential.applicationDefault()
-        }
-
-        this.app = admin.initializeApp(appConfig)
-      }
-
-      // Get database instance
-      this.db = this.app.database()
-
-      // If using emulator and this is a new app, connect to emulator
-      // Note: useEmulator() can only be called ONCE per app instance
-      if (this.config.useEmulator && isNewApp) {
-        const emulatorHost = process.env.FIREBASE_EMULATOR_HOST || 'localhost:9000'
-        const [host, port] = emulatorHost.split(':')
-        this.db.useEmulator(host, parseInt(port, 10))
-      }
-    } catch (error) {
-      throw new Error(
-        `Failed to initialize Firebase adapter: ${error instanceof Error ? error.message : String(error)}`
-      )
     }
+
+    // Get or create Firebase app
+    this.app = this.getOrCreateApp()
+    this.db = this.app.database()
+  }
+
+  /**
+   * Get existing Firebase app or create a new one
+   */
+  private getOrCreateApp(): admin.app.App {
+    try {
+      return admin.app('[DEFAULT]')
+    } catch {
+      return this.createApp()
+    }
+  }
+
+  /**
+   * Create and initialize a new Firebase app
+   */
+  private createApp(): admin.app.App {
+    const appConfig: admin.AppOptions = {
+      projectId: this.config.projectId,
+      databaseURL: this.config.databaseURL,
+    }
+
+    // Add credentials based on configuration
+    if (this.config.credentials) {
+      appConfig.credential = admin.credential.cert(this.config.credentials)
+    } else if (this.config.credentialsPath) {
+      appConfig.credential = admin.credential.cert(this.config.credentialsPath)
+    } else if (!this.config.useEmulator) {
+      // Use Application Default Credentials for production
+      appConfig.credential = admin.credential.applicationDefault()
+    }
+    // For emulator, no credential needed - handled via environment variable
+
+    return admin.initializeApp(appConfig)
   }
 
   async saveGameState(roomId: RoomId, state: GameState): Promise<void> {

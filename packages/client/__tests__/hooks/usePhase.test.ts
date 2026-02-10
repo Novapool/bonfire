@@ -8,7 +8,7 @@ import type { GameState } from '@bonfire/core';
 describe('usePhase', () => {
   it('should return null phase initially', () => {
     const { result } = renderWithProvider(() => usePhase());
-    expect(result.current.phase).toBeNull();
+    expect(result.current).toBeNull();
   });
 
   it('should return current phase from state', () => {
@@ -25,10 +25,10 @@ describe('usePhase', () => {
       client.simulateStateUpdate(state);
     });
 
-    expect(result.current.phase).toBe('voting');
+    expect(result.current).toBe('voting');
   });
 
-  it('should correctly identify phase with isPhase', () => {
+  it('should allow direct phase comparison', () => {
     const client = new MockBonfireClient();
     const { result } = renderWithProvider(() => usePhase(), client);
 
@@ -40,9 +40,9 @@ describe('usePhase', () => {
       });
     });
 
-    expect(result.current.isPhase('voting')).toBe(true);
-    expect(result.current.isPhase('lobby')).toBe(false);
-    expect(result.current.isPhase('reveal')).toBe(false);
+    expect(result.current === 'voting').toBe(true);
+    expect(result.current === 'lobby').toBe(false);
+    expect(result.current === 'reveal').toBe(false);
   });
 
   it('should update phase when state changes', () => {
@@ -52,11 +52,11 @@ describe('usePhase', () => {
     act(() => {
       client.simulateStateUpdate({ roomId: 'A', phase: 'lobby', players: [] });
     });
-    expect(result.current.phase).toBe('lobby');
+    expect(result.current).toBe('lobby');
 
     act(() => {
       client.simulateStateUpdate({ roomId: 'A', phase: 'playing', players: [] });
     });
-    expect(result.current.phase).toBe('playing');
+    expect(result.current).toBe('playing');
   });
 });

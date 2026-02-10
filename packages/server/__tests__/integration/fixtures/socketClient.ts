@@ -26,24 +26,11 @@ export function createTestClient(port: number): TestSocket {
  * Connect a Socket.io client and wait for connection
  *
  * @param socket - Socket.io client instance
- * @param timeout - Connection timeout in milliseconds
  */
-export function connectClient(socket: TestSocket, timeout: number = 5000): Promise<void> {
+export function connectClient(socket: TestSocket): Promise<void> {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error('Connection timeout'))
-    }, timeout)
-
-    socket.once('connect', () => {
-      clearTimeout(timer)
-      resolve()
-    })
-
-    socket.once('connect_error', (error) => {
-      clearTimeout(timer)
-      reject(error)
-    })
-
+    socket.once('connect', resolve)
+    socket.once('connect_error', reject)
     socket.connect()
   })
 }
@@ -52,19 +39,10 @@ export function connectClient(socket: TestSocket, timeout: number = 5000): Promi
  * Disconnect a Socket.io client and wait for disconnection
  *
  * @param socket - Socket.io client instance
- * @param timeout - Disconnection timeout in milliseconds
  */
-export function disconnectClient(socket: TestSocket, timeout: number = 5000): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error('Disconnection timeout'))
-    }, timeout)
-
-    socket.once('disconnect', () => {
-      clearTimeout(timer)
-      resolve()
-    })
-
+export function disconnectClient(socket: TestSocket): Promise<void> {
+  return new Promise((resolve) => {
+    socket.once('disconnect', resolve)
     socket.disconnect()
   })
 }
@@ -74,22 +52,13 @@ export function disconnectClient(socket: TestSocket, timeout: number = 5000): Pr
  *
  * @param socket - Socket.io client instance
  * @param event - Event name to wait for
- * @param timeout - Event timeout in milliseconds
  * @returns Event data
  */
 export function waitForEvent<T = any>(
   socket: TestSocket,
-  event: string,
-  timeout: number = 5000
+  event: string
 ): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error(`Event timeout: ${event}`))
-    }, timeout)
-
-    socket.once(event as any, (data: T) => {
-      clearTimeout(timer)
-      resolve(data)
-    })
+  return new Promise((resolve) => {
+    socket.once(event as any, resolve)
   })
 }

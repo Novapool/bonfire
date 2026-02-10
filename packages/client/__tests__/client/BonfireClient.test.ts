@@ -146,19 +146,6 @@ describe('BonfireClient', () => {
       expect(playerJoinedSpy).toHaveBeenCalledWith({ name: 'Alice' });
     });
 
-    it('should dispatch game events to wildcard listeners', () => {
-      const wildcardSpy = vi.fn();
-      client.onGameEvent('*', wildcardSpy);
-
-      const handler = getHandler('event:emit');
-      handler({ type: 'player:joined', payload: { name: 'Alice' } });
-
-      expect(wildcardSpy).toHaveBeenCalledWith({
-        type: 'player:joined',
-        payload: { name: 'Alice' },
-      });
-    });
-
     it('should forward error events to listeners', () => {
       const errorSpy = vi.fn();
       client.onError(errorSpy);

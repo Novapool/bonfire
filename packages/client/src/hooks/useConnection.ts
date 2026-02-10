@@ -17,7 +17,7 @@ export function useConnection(): {
   const { client } = useBonfireContext();
 
   const subscribe = useCallback(
-    (onStoreChange: () => void) => client.onStatusChange(() => onStoreChange()),
+    (onStoreChange: () => void) => client.onStatusChange(onStoreChange),
     [client]
   );
 

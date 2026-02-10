@@ -1,11 +1,21 @@
 /**
  * Client-specific type definitions for Bonfire
  *
- * Response types are duplicated from @bonfire/server to avoid
- * depending on the server package (which has Node.js-only deps).
+ * Response types are imported from @bonfire/core to maintain
+ * type safety between client and server without duplication.
  */
 
-import type { GameState, RoomId, PlayerId } from '@bonfire/core';
+import type {
+  GameState,
+  RoomId,
+  PlayerId,
+  BaseResponse,
+  RoomCreateResponse,
+  RoomJoinResponse,
+  StateResponse,
+  ActionResponse,
+  ErrorResponse,
+} from '@bonfire/core';
 
 // ---- Connection ----
 
@@ -26,36 +36,15 @@ export interface BonfireClientConfig {
   reconnectionAttempts?: number;
 }
 
-// ---- Server Response Types (mirrored from @bonfire/server) ----
-
-export interface BaseResponse {
-  success: boolean;
-  error?: string;
-  code?: string;
-}
-
-export interface RoomCreateResponse extends BaseResponse {
-  roomId?: RoomId;
-  state?: GameState;
-}
-
-export interface RoomJoinResponse extends BaseResponse {
-  state?: GameState;
-  playerId?: PlayerId;
-}
-
-export interface StateResponse extends BaseResponse {
-  state?: GameState;
-}
-
-export interface ActionResponse extends BaseResponse {
-  data?: unknown;
-}
-
-export interface ErrorResponse {
-  message: string;
-  code: string;
-  details?: Record<string, unknown>;
+// ---- Server Response Types (imported from @bonfire/core) ----
+// Re-export for convenience
+export type {
+  BaseResponse,
+  RoomCreateResponse,
+  RoomJoinResponse,
+  StateResponse,
+  ActionResponse,
+  ErrorResponse,
 }
 
 // ---- Socket.io Event Contracts (mirrored from @bonfire/server) ----

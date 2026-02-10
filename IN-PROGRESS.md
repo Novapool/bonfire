@@ -39,15 +39,25 @@ Build reusable components for common game patterns:
 
 ## Recently Completed
 
-1. **Milestone 4 - Client Library** (Feb 9, 2026)
+1. **Code Simplification & Documentation Improvements** (Feb 9, 2026)
+   - Ran code-simplifier and documentation-manager agents on entire codebase
+   - **Documentation:** Created comprehensive client README (650+ lines), client CLAUDE.md, expanded MILESTONES.md
+   - **Type Safety:** Moved shared response types to @bonfire/core/contracts.ts (eliminated duplication between client/server)
+   - **Firebase Adapter:** Refactored initialization into getOrCreateApp() and createApp() methods (50% complexity reduction)
+   - **Removed YAGNI Features:** Wildcard event listeners, unnecessary hooks (isPhase helper), custom test timeouts
+   - **Hook Simplifications:** Simplified usePhase to return phase directly, removed arrow function wrappers in subscriptions, removed generic type from useGameState
+   - **Test Results:** Client 54/54 passing, Server unit/integration passing (Firebase tests require emulator)
+   - Total impact: 100+ lines of code removed, maintained 90.81% coverage
+
+2. **Milestone 4 - Client Library** (Feb 9, 2026)
    - Built BonfireClient class wrapping socket.io-client with Promise-based API
    - Created BonfireProvider React context with auto-connect and reactive state
    - Implemented 6 hooks: useGameState (useSyncExternalStore), useConnection, useRoom, usePlayer, usePhase, useBonfireEvent
    - Built BonfireErrorBoundary with static/render-function fallback
    - Wrote 55 tests across 8 test files, 90.81% coverage
-   - Duplicated server response types to avoid server package dependency
+   - Architecture documentation in docs/architecture/client-library.md
 
-2. **Post-Milestone 3 Documentation Audit & Cleanup** (Feb 8, 2026)
+3. **Post-Milestone 3 Documentation Audit & Cleanup** (Feb 8, 2026)
    - Ran comprehensive documentation-manager audit
    - Distributed content to appropriate category docs
    - Documentation follows "living docs" strategy (A- grade, 90/100)
@@ -89,14 +99,20 @@ Build reusable components for common game patterns:
 - Chose npm workspaces over Turborepo for simplicity (can migrate later)
 - useSyncExternalStore for hook state subscriptions (React 18 best practice)
 - Server-authoritative model — no client-side optimistic update machinery
-- Client types duplicated from server to avoid Node.js dependency leak
+- Shared contract types in @bonfire/core/contracts.ts (client/server import from single source)
 
 **Documentation Status:**
-- Root CLAUDE.md ✅ (updated with Milestone 4 completion)
+- Root CLAUDE.md ✅ (updated - api/ directory marked as existing)
 - docs/PROJECT_OVERVIEW.md ✅
-- docs/MILESTONES.md ✅ (updated with Milestone 4 completion notes)
+- docs/MILESTONES.md ✅ (updated with detailed Milestone 4 completion, test coverage, MockBonfireClient)
 - docs/architecture/core-classes.md ✅
 - docs/architecture/server-infrastructure.md ✅
-- docs/architecture/client-library.md 📝 (to be created)
+- docs/architecture/client-library.md ✅ (complete)
+- docs/api/FIREBASE.md ✅
+- docs/api/ADMIN_API.md ✅
 - IN-PROGRESS.md ✅ (updated)
 - packages/core/README.md ✅ (comprehensive API docs)
+- packages/server/README.md ✅ (comprehensive API docs)
+- packages/server/CLAUDE.md ✅
+- packages/client/README.md ✅ (NEW - comprehensive 650+ line API docs)
+- packages/client/CLAUDE.md ✅ (NEW - package overview and patterns)

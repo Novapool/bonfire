@@ -46,7 +46,7 @@ bonfire/
 │   └── client/        - Client library and components (Milestone 4+)
 └── docs/
     ├── architecture/  - Core class design and system architecture
-    ├── api/           - API integration docs (future)
+    ├── api/           - API integration and endpoint documentation
     ├── MILESTONES.md  - Development roadmap
     └── PROJECT_OVERVIEW.md - Vision and philosophy
 ```

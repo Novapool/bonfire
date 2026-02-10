@@ -6,24 +6,31 @@ import type { GameState } from '@bonfire/core';
  * Subscribe to game state updates from the server.
  *
  * Uses `useSyncExternalStore` for tear-free reads in concurrent mode.
- * The generic parameter allows narrowing to a game-specific state type.
  *
  * @example
- * const { state } = useGameState<MyGameState>();
- * if (state) console.log(state.customField);
+ * const { state } = useGameState();
+ * if (state) console.log(state.phase);
+ *
+ * // For custom state fields, use type assertion:
+ * interface MyGameState extends GameState {
+ *   score: Record<string, number>;
+ * }
+ * const { state } = useGameState();
+ * const myState = state as MyGameState;
+ * if (myState) console.log(myState.score);
  */
-export function useGameState<TState extends GameState = GameState>(): {
-  state: TState | null;
+export function useGameState(): {
+  state: GameState | null;
   requestState: () => Promise<void>;
 } {
   const { client } = useBonfireContext();
 
   const subscribe = useCallback(
-    (onStoreChange: () => void) => client.onStateChange(() => onStoreChange()),
+    (onStoreChange: () => void) => client.onStateChange(onStoreChange),
     [client]
   );
 
-  const getSnapshot = useCallback(() => client.gameState as TState | null, [client]);
+  const getSnapshot = useCallback(() => client.gameState, [client]);
 
   const state = useSyncExternalStore(subscribe, getSnapshot);
 

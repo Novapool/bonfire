@@ -1,45 +1,70 @@
 # IN-PROGRESS - Bonfire
 
-**Last Updated:** February 9, 2026 (Milestone 4 Complete!)
+**Last Updated:** February 11, 2026 (Milestone 5 - Phases 1-2 Complete)
 
 ---
 
 ## Current Work
 
-### Milestone 4 - Client Library
-- Status: ✅ Complete!
-- Goal: Create React hooks and utilities for game UIs
+### Milestone 5 - UI Component Library (IN PROGRESS)
+- Status: 🔵 40% Complete (Phases 1-2 of 5 done)
+- Goal: Build reusable UI components for common party game patterns
 
-**What Was Built:**
-- ✅ BonfireClient class (Socket.io wrapper with Promise-based API and subscription model)
-- ✅ BonfireProvider React context (auto-connect, reactive state/status)
-- ✅ 6 React hooks: useGameState, useConnection, useRoom, usePlayer, usePhase, useBonfireEvent
-- ✅ BonfireErrorBoundary component
-- ✅ 55 tests, 90.81% coverage (all hooks at 100%)
+**What Was Built (Phases 1-2):**
+
+**Phase 1 - Infrastructure:**
+- ✅ Tailwind CSS v4 configured with @theme directive for design tokens
+- ✅ PostCSS build pipeline (`npm run build:css`)
+- ✅ Storybook 8 installed and configured
+- ✅ BonfireProvider decorator for Storybook stories
+- ✅ Design system tokens (colors, spacing, typography, animations)
+
+**Phase 2 - Core Components:**
+- ✅ **PlayerAvatar** - Player representation with initials, color hash, status, host badge (13 tests)
+- ✅ **Timer** - Countdown timer with circular progress ring and variant colors (12 tests)
+- ✅ **Lobby** - Full lobby with room code, player list, start button (18 tests)
+- ✅ **colorHash utility** - Deterministic color generation from names (11 tests)
+
+**Test Results:** 59 new tests (48 component + 11 utility), all passing
 
 ---
 
 ## Active Plan
 
-**Milestone 4: ✅ COMPLETE!**
+**Milestone 5 - Remaining Work (Phases 3-5):**
 
-Client library is fully functional with React hooks for game UI development.
+**Phase 3: Input & Display Components** (6-8 hours)
+- `<PromptCard>` - Themed question/prompt display with variants
+- `<ResponseInput>` - Polymorphic input (text/multiple-choice/ranking)
 
-**Next: Milestone 5 - UI Component Library**
+**Phase 4: Advanced Components** (8-10 hours)
+- `<RevealPhase>` - Sequential reveal animation for answers/players
+- `<GameProgress>` - Round/phase progress indicator (bar/dots/number)
+- `<VotingInterface>` - Standard voting UI pattern
 
-Build reusable components for common game patterns:
-1. `<Lobby>` - Room code display, player list, ready states
-2. `<PromptCard>` - Themed question/prompt display
-3. `<Timer>` - Countdown with visual feedback
-4. `<ResponseInput>` - Text, multiple choice, ranking inputs
-5. `<RevealPhase>` - Animated answer reveals
-6. Create Storybook documentation
+**Phase 5: Testing & Documentation** (4-6 hours)
+- Achieve 85%+ test coverage for all components
+- Write Storybook MDX documentation
+- Update package exports in src/index.ts
+- Update README.md, CLAUDE.md, architecture docs
+- Update MILESTONES.md with completion status
+
+**Estimated time remaining:** 20-25 hours focused work
 
 ---
 
 ## Recently Completed
 
-1. **Code Simplification & Documentation Improvements** (Feb 9, 2026)
+1. **Milestone 5 - UI Components Phase 1-2** (Feb 11, 2026)
+   - Set up Tailwind CSS v4 with @theme directive for design tokens
+   - Configured Storybook 8 with BonfireProvider decorator
+   - Built 3 core components: Lobby, Timer, PlayerAvatar
+   - Created colorHash utility for deterministic player colors
+   - Wrote 59 tests (48 component + 11 utility), all passing
+   - Components use existing hooks (useGameState, usePlayer, useRoom)
+   - Fixed test infrastructure for component rendering with BonfireProvider
+
+2. **Code Simplification & Documentation Improvements** (Feb 9, 2026)
    - Ran code-simplifier and documentation-manager agents on entire codebase
    - **Documentation:** Created comprehensive client README (650+ lines), client CLAUDE.md, expanded MILESTONES.md
    - **Type Safety:** Moved shared response types to @bonfire/core/contracts.ts (eliminated duplication between client/server)
@@ -49,7 +74,7 @@ Build reusable components for common game patterns:
    - **Test Results:** Client 54/54 passing, Server unit/integration passing (Firebase tests require emulator)
    - Total impact: 100+ lines of code removed, maintained 90.81% coverage
 
-2. **Milestone 4 - Client Library** (Feb 9, 2026)
+3. **Milestone 4 - Client Library** (Feb 9, 2026)
    - Built BonfireClient class wrapping socket.io-client with Promise-based API
    - Created BonfireProvider React context with auto-connect and reactive state
    - Implemented 6 hooks: useGameState (useSyncExternalStore), useConnection, useRoom, usePlayer, usePhase, useBonfireEvent
@@ -57,12 +82,12 @@ Build reusable components for common game patterns:
    - Wrote 55 tests across 8 test files, 90.81% coverage
    - Architecture documentation in docs/architecture/client-library.md
 
-3. **Post-Milestone 3 Documentation Audit & Cleanup** (Feb 8, 2026)
+4. **Post-Milestone 3 Documentation Audit & Cleanup** (Feb 8, 2026)
    - Ran comprehensive documentation-manager audit
    - Distributed content to appropriate category docs
    - Documentation follows "living docs" strategy (A- grade, 90/100)
 
-3. **Milestone 3 - Server Infrastructure** (Feb 8, 2026)
+5. **Milestone 3 - Server Infrastructure** (Feb 8, 2026)
    - Complete server with Socket.io, room management, and Firebase integration
    - 138 total tests (97 unit + 41 integration)
 

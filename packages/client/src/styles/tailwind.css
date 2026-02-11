@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Brand Colors */
+  --color-brand-primary: #6366f1;
+  --color-brand-secondary: #8b5cf6;
+  --color-brand-accent: #ec4899;
+
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Surface Colors */
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f9fafb;
+  --color-surface-overlay: #111827;
+
+  /* Text Colors */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-inverse: #ffffff;
+
+  /* Extended Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* Typography */
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+
+  /* Border Radius */
+  --radius-button: 0.5rem;
+  --radius-card: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-elevated: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-overlay: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* Animation Durations */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+}
+
+/* Base Styles */
+@layer base {
+  body {
+    font-family: var(--font-body);
+    color: var(--color-text-primary);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Component Utilities */
+@layer utilities {
+  .transition-bonfire {
+    transition-duration: var(--duration-normal);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-bonfire-fast {
+    transition-duration: var(--duration-fast);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-bonfire-slow {
+    transition-duration: var(--duration-slow);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

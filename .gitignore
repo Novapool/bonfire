@@ -49,3 +49,6 @@ packages/server/credentials/
 *.json
 !firebase.json
 !database.rules.json
+
+*storybook.log
+storybook-static

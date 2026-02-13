@@ -1,95 +1,58 @@
 # IN-PROGRESS - Bonfire
 
-**Last Updated:** February 11, 2026 (Milestone 5 - Phases 1-2 Complete)
+**Last Updated:** February 12, 2026 (Milestone 5 Complete)
 
 ---
 
 ## Current Work
 
-### Milestone 5 - UI Component Library (IN PROGRESS)
-- Status: 🔵 40% Complete (Phases 1-2 of 5 done)
-- Goal: Build reusable UI components for common party game patterns
-
-**What Was Built (Phases 1-2):**
-
-**Phase 1 - Infrastructure:**
-- ✅ Tailwind CSS v4 configured with @theme directive for design tokens
-- ✅ PostCSS build pipeline (`npm run build:css`)
-- ✅ Storybook 8 installed and configured
-- ✅ BonfireProvider decorator for Storybook stories
-- ✅ Design system tokens (colors, spacing, typography, animations)
-
-**Phase 2 - Core Components:**
-- ✅ **PlayerAvatar** - Player representation with initials, color hash, status, host badge (13 tests)
-- ✅ **Timer** - Countdown timer with circular progress ring and variant colors (12 tests)
-- ✅ **Lobby** - Full lobby with room code, player list, start button (18 tests)
-- ✅ **colorHash utility** - Deterministic color generation from names (11 tests)
-
-**Test Results:** 59 new tests (48 component + 11 utility), all passing
+### Milestone 6 - First Game: Intimacy Ladder v2 (NOT STARTED)
+- Status: 🔴 Not Started
+- Goal: Build a complete game using the framework to validate abstractions
 
 ---
 
 ## Active Plan
 
-**Milestone 5 - Remaining Work (Phases 3-5):**
+No active plan. Milestone 5 is complete. Ready to begin Milestone 6.
 
-**Phase 3: Input & Display Components** (6-8 hours)
-- `<PromptCard>` - Themed question/prompt display with variants
-- `<ResponseInput>` - Polymorphic input (text/multiple-choice/ranking)
-
-**Phase 4: Advanced Components** (8-10 hours)
-- `<RevealPhase>` - Sequential reveal animation for answers/players
-- `<GameProgress>` - Round/phase progress indicator (bar/dots/number)
-- `<VotingInterface>` - Standard voting UI pattern
-
-**Phase 5: Testing & Documentation** (4-6 hours)
-- Achieve 85%+ test coverage for all components
-- Write Storybook MDX documentation
-- Update package exports in src/index.ts
-- Update README.md, CLAUDE.md, architecture docs
-- Update MILESTONES.md with completion status
-
-**Estimated time remaining:** 20-25 hours focused work
+**Milestone 6 Tasks (from MILESTONES.md):**
+- Port Intimacy Ladder to new framework
+- Implement progressive disclosure mechanic
+- Add reflection phase between rounds
+- Create question database with levels
+- Build mobile-responsive UI
+- Add game settings (customize levels, time limits)
+- Implement "skip question" functionality
+- Test with real users, gather feedback
+- Document pain points in framework usage
 
 ---
 
 ## Recently Completed
 
-1. **Milestone 5 - UI Components Phase 1-2** (Feb 11, 2026)
+1. **Milestone 5 - UI Components Phase 4** (Feb 12, 2026)
+   - Built `<RevealPhase>` - Sequential animated reveal for answers/players, supports custom renderItem, configurable delay, onRevealComplete callback
+   - Built `<GameProgress>` - Progress indicator with bar/dots/number variants, all with ARIA progressbar role
+   - Built `<VotingInterface>` - Full voting UI with results display, vote counts, percentages, winner highlighting
+   - Added Storybook stories for all 3 Phase 4 components
+   - Exported all new components from @bonfire/client index.ts
+   - **205 total tests, all passing** (46 new for Phase 4)
+   - Updated all documentation (CLAUDE.md, MILESTONES.md, IN-PROGRESS.md, client CLAUDE.md, client README.md)
+
+2. **Milestone 5 - UI Components Phase 3** (Feb 12, 2026)
+   - Built PromptCard with 4 variants (standard/spicy/creative/dare), category badge, round indicator
+   - Built ResponseInput: text (single/multiline), multiple-choice (single/multi-select), ranking modes
+   - Exported all 5 components + colorHash utility from @bonfire/client index
+   - Added Storybook stories for both components (including combined PromptCard+ResponseInput demo)
+   - 159 tests total (100 new for Phase 3), all passing
+
+3. **Milestone 5 - UI Components Phase 1-2** (Feb 11, 2026)
    - Set up Tailwind CSS v4 with @theme directive for design tokens
    - Configured Storybook 8 with BonfireProvider decorator
    - Built 3 core components: Lobby, Timer, PlayerAvatar
    - Created colorHash utility for deterministic player colors
    - Wrote 59 tests (48 component + 11 utility), all passing
-   - Components use existing hooks (useGameState, usePlayer, useRoom)
-   - Fixed test infrastructure for component rendering with BonfireProvider
-
-2. **Code Simplification & Documentation Improvements** (Feb 9, 2026)
-   - Ran code-simplifier and documentation-manager agents on entire codebase
-   - **Documentation:** Created comprehensive client README (650+ lines), client CLAUDE.md, expanded MILESTONES.md
-   - **Type Safety:** Moved shared response types to @bonfire/core/contracts.ts (eliminated duplication between client/server)
-   - **Firebase Adapter:** Refactored initialization into getOrCreateApp() and createApp() methods (50% complexity reduction)
-   - **Removed YAGNI Features:** Wildcard event listeners, unnecessary hooks (isPhase helper), custom test timeouts
-   - **Hook Simplifications:** Simplified usePhase to return phase directly, removed arrow function wrappers in subscriptions, removed generic type from useGameState
-   - **Test Results:** Client 54/54 passing, Server unit/integration passing (Firebase tests require emulator)
-   - Total impact: 100+ lines of code removed, maintained 90.81% coverage
-
-3. **Milestone 4 - Client Library** (Feb 9, 2026)
-   - Built BonfireClient class wrapping socket.io-client with Promise-based API
-   - Created BonfireProvider React context with auto-connect and reactive state
-   - Implemented 6 hooks: useGameState (useSyncExternalStore), useConnection, useRoom, usePlayer, usePhase, useBonfireEvent
-   - Built BonfireErrorBoundary with static/render-function fallback
-   - Wrote 55 tests across 8 test files, 90.81% coverage
-   - Architecture documentation in docs/architecture/client-library.md
-
-4. **Post-Milestone 3 Documentation Audit & Cleanup** (Feb 8, 2026)
-   - Ran comprehensive documentation-manager audit
-   - Distributed content to appropriate category docs
-   - Documentation follows "living docs" strategy (A- grade, 90/100)
-
-5. **Milestone 3 - Server Infrastructure** (Feb 8, 2026)
-   - Complete server with Socket.io, room management, and Firebase integration
-   - 138 total tests (97 unit + 41 integration)
 
 ---
 
@@ -101,15 +64,16 @@
 
 ## Next Steps
 
-1. **Short-term (Next Sprint):**
-   - Begin Milestone 5: UI Component Library
-   - Set up Storybook or similar documentation
-   - Build Lobby, Timer, and PromptCard components
-   - Add Tailwind CSS theming system
+1. **Short-term (Next Sprint — Milestone 6):**
+   - Create new package or app for Intimacy Ladder v2
+   - Design game state structure (phases, question levels, player actions)
+   - Port existing game logic and question database
 
-2. **Medium-term (Following Sprints):**
-   - Create first game (Intimacy Ladder v2) using framework (Milestone 6)
-   - Validate and refine framework based on real usage (Milestone 7)
+2. **Medium-term (Milestone 7+):**
+   - Framework refinement based on Intimacy Ladder experience
+   - Build second game to prove framework flexibility
+   - CLI tool (`create-bonfire-game`) for scaffolding new games
+   - Documentation site (Docusaurus/VitePress)
 
 ---
 
@@ -120,6 +84,13 @@
 - Three main packages: @bonfire/core, /server, /client
 - Using npm workspaces for dependency management
 
+**UI Component Library Summary (Milestone 5 Complete):**
+- 8 components: Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
+- 1 utility: colorHash
+- 205 tests, all passing
+- Storybook 8 with full story coverage
+- Tailwind CSS v4 with design system tokens
+
 **Key Decisions:**
 - Chose npm workspaces over Turborepo for simplicity (can migrate later)
 - useSyncExternalStore for hook state subscriptions (React 18 best practice)
@@ -127,17 +98,17 @@
 - Shared contract types in @bonfire/core/contracts.ts (client/server import from single source)
 
 **Documentation Status:**
-- Root CLAUDE.md ✅ (updated - api/ directory marked as existing)
+- Root CLAUDE.md ✅ (updated Feb 12, 2026 - Milestone 5 complete)
 - docs/PROJECT_OVERVIEW.md ✅
-- docs/MILESTONES.md ✅ (updated with detailed Milestone 4 completion, test coverage, MockBonfireClient)
+- docs/MILESTONES.md ✅ (updated Feb 12, 2026 - Milestone 5 complete, 5/13 done)
 - docs/architecture/core-classes.md ✅
 - docs/architecture/server-infrastructure.md ✅
-- docs/architecture/client-library.md ✅ (complete)
+- docs/architecture/client-library.md ✅
 - docs/api/FIREBASE.md ✅
 - docs/api/ADMIN_API.md ✅
-- IN-PROGRESS.md ✅ (updated)
-- packages/core/README.md ✅ (comprehensive API docs)
-- packages/server/README.md ✅ (comprehensive API docs)
+- IN-PROGRESS.md ✅ (updated Feb 12, 2026)
+- packages/core/README.md ✅
+- packages/server/README.md ✅
 - packages/server/CLAUDE.md ✅
-- packages/client/README.md ✅ (NEW - comprehensive 650+ line API docs)
-- packages/client/CLAUDE.md ✅ (NEW - package overview and patterns)
+- packages/client/README.md ✅
+- packages/client/CLAUDE.md ✅

@@ -15,6 +15,25 @@ export { useBonfireEvent } from './hooks/useBonfireEvent';
 
 // ---- Components ----
 export { BonfireErrorBoundary } from './components/BonfireErrorBoundary';
+export { Lobby } from './components/Lobby';
+export type { LobbyProps } from './components/Lobby';
+export { Timer } from './components/Timer';
+export type { TimerProps } from './components/Timer';
+export { PlayerAvatar } from './components/PlayerAvatar';
+export type { PlayerAvatarProps } from './components/PlayerAvatar';
+export { PromptCard } from './components/PromptCard';
+export type { PromptCardProps, PromptVariant } from './components/PromptCard';
+export { ResponseInput } from './components/ResponseInput';
+export type { ResponseInputProps, InputConfig, TextInputConfig, MultipleChoiceConfig, RankingConfig, Choice } from './components/ResponseInput';
+export { RevealPhase } from './components/RevealPhase';
+export type { RevealPhaseProps, RevealItem } from './components/RevealPhase';
+export { GameProgress } from './components/GameProgress';
+export type { GameProgressProps, GameProgressVariant } from './components/GameProgress';
+export { VotingInterface } from './components/VotingInterface';
+export type { VotingInterfaceProps, VoteOption } from './components/VotingInterface';
+
+// ---- Utils ----
+export { getPlayerColor, getPlayerInitials } from './utils/colorHash';
 
 // ---- Types ----
 export type {

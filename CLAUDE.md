@@ -7,7 +7,8 @@ Milestone 1: Foundation & Architecture ✅ Complete (Feb 8, 2026)
 Milestone 2: Core Game Engine ✅ Complete (Feb 8, 2026)
 Milestone 3: Server Infrastructure ✅ Complete (Feb 8, 2026)
 Milestone 4: Client Library ✅ Complete (Feb 9, 2026)
-**Next:** Milestone 5: UI Component Library 🔵
+Milestone 5: UI Component Library ✅ Complete (Feb 12, 2026)
+**Next:** Milestone 6: First Game - Intimacy Ladder v2 🔵
 
 ## Documentation
 
@@ -26,7 +27,7 @@ Milestone 4: Client Library ✅ Complete (Feb 9, 2026)
   - Read when: Understanding framework internals, contributing to core, debugging issues
   - `core-classes.md` - Game engine architecture (SocialGame, PlayerManager, validators)
   - `server-infrastructure.md` - Server classes (SocketServer, RoomManager, SocketStateSynchronizer, adapters)
-  - `client-library.md` - Client library architecture (BonfireClient, Provider, hooks)
+  - `client-library.md` - Client library architecture (BonfireClient, Provider, hooks, UI components)
 
 - `docs/api/` - API integration and endpoint documentation
   - Read when: Setting up databases, deploying servers, managing production

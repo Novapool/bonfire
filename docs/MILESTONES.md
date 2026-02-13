@@ -238,23 +238,49 @@
 
 ---
 
-## Milestone 5: UI Component Library 🔴
+## Milestone 5: UI Component Library 🟢
 
 **Goal:** Build reusable components for common game patterns
 
-### Tasks
-- [ ] 🔴 `<Lobby>` - Room code display, player list, ready states
-- [ ] 🔴 `<PromptCard>` - Themed question/prompt display
-- [ ] 🔴 `<ResponseInput>` - Text, multiple choice, ranking inputs
-- [ ] 🔴 `<Timer>` - Countdown with visual feedback
-- [ ] 🔴 `<RevealPhase>` - Animated answer reveals
-- [ ] 🔴 `<PlayerAvatar>` - Consistent player representation
-- [ ] 🔴 `<GameProgress>` - Round/phase indicators
-- [ ] 🔴 `<VotingInterface>` - Standard voting UI patterns
-- [ ] 🔴 Create Storybook documentation for all components
-- [ ] 🔴 Add Tailwind CSS theming system
+**Status:** ✅ Complete (Feb 12, 2026)
 
-**Deliverable:** Component library with visual documentation
+### Phase 1: Infrastructure ✅ Complete
+- [x] 🟢 Tailwind CSS v4 configured with @theme directive for design tokens
+- [x] 🟢 PostCSS build pipeline (`npm run build:css`)
+- [x] 🟢 Storybook 8 installed and configured with BonfireProvider decorator
+- [x] 🟢 Design system tokens (colors, spacing, typography, animations)
+
+### Phase 2: Core Components ✅ Complete
+- [x] 🟢 `<PlayerAvatar>` - Player initials, deterministic color hash, status indicator, host badge (5 sizes: xs/sm/md/lg/xl, 13 tests)
+- [x] 🟢 `<Timer>` - Countdown with circular SVG progress ring, 3 variants (default/warning/danger), 3 sizes (12 tests)
+- [x] 🟢 `<Lobby>` - Room code display with clipboard copy, player list, start button (18 tests)
+- [x] 🟢 `colorHash` utility - Deterministic color and initials generation from player names (11 tests)
+
+### Phase 3: Input & Display Components ✅ Complete
+- [x] 🟢 `<PromptCard>` - Themed prompt display with 4 variants (standard/spicy/creative/dare), category badge, round indicator, subtitle, children slot (16 tests)
+- [x] 🟢 `<ResponseInput>` - Polymorphic input: text (single-line/multiline/maxLength), multiple-choice (single/multi-select), ranking (add/reorder/remove) (34 tests)
+- [x] 🟢 Storybook stories for all Phase 2-3 components
+
+### Phase 4: Advanced Components ✅ Complete
+- [x] 🟢 `<RevealPhase>` - Animated sequential reveal for answers/players (17 tests)
+- [x] 🟢 `<GameProgress>` - Round/phase progress indicator (bar/dots/number) (15 tests)
+- [x] 🟢 `<VotingInterface>` - Standard voting UI pattern with results display (20 tests)
+
+### Phase 5: Testing & Documentation ✅ Complete
+- [x] 🟢 All Phase 4 components have comprehensive tests (205 total tests, all passing)
+- [x] 🟢 Storybook stories for all Phase 4 components
+- [x] 🟢 Updated README.md, CLAUDE.md, MILESTONES.md, and IN-PROGRESS.md
+
+**What Was Built (Phases 1-4):**
+- **8 reusable UI components** exported from `@bonfire/client`: Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
+- **colorHash utility** for deterministic player color assignment
+- **Storybook 8** with full story coverage for all components
+- **Tailwind CSS v4** design system with tokens for brand colors, surface, text variants, animations
+- **205 tests** across all components, all passing
+
+**Architecture Documentation:** See `docs/architecture/client-library.md` for component API reference.
+
+**Deliverable:** ✅ Component library with visual documentation
 
 ---
 
@@ -429,11 +455,11 @@
 
 ## Progress Tracking
 
-**Overall Progress:** 4/13 milestones complete (30.8%)
+**Overall Progress:** 5/13 milestones complete (38.5%) — Milestone 6 next
 
-**Current Focus:** Milestone 5 - UI Component Library (Next)
+**Current Focus:** Milestone 6 - First Game (Intimacy Ladder v2)
 
-**Last Updated:** February 9, 2026
+**Last Updated:** February 12, 2026
 
 ---
 

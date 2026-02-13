@@ -2,7 +2,7 @@
 
 React hooks and utilities for building Bonfire party game UIs.
 
-**Status:** ✅ Milestone 4 Complete - 8 test files, 55 tests, 90.81% coverage
+**Status:** Milestone 4 Complete + Milestone 5 UI Components Complete ✅ - 205 tests, all passing
 
 ---
 
@@ -13,6 +13,10 @@ This package provides the client-side React integration for Bonfire games:
 - **BonfireProvider** - React context provider for client access
 - **6 React hooks** - Type-safe hooks for game state, connection, room management, player data, phase tracking, and events
 - **BonfireErrorBoundary** - Error boundary component for graceful error handling
+- **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
+- **colorHash utility** - Deterministic player color generation from names
+- **Storybook 8** - Interactive component documentation
+- **Tailwind CSS v4** - Design system with `@theme` tokens
 - **MockBonfireClient** - Test utility for simulating client behavior
 
 ---
@@ -34,8 +38,26 @@ src/
 │   ├── usePlayer.ts                  - Player data and derived state
 │   ├── usePhase.ts                   - Current phase tracking
 │   └── useBonfireEvent.ts            - Custom event subscription
-└── components/
-    └── BonfireErrorBoundary.tsx      - Error boundary component
+├── components/
+│   ├── BonfireErrorBoundary.tsx      - Error boundary component
+│   ├── Lobby.tsx                     - Pre-built lobby screen (room code, players, start)
+│   ├── Lobby.stories.tsx
+│   ├── PlayerAvatar.tsx              - Player avatar (initials, color, status, host crown)
+│   ├── PlayerAvatar.stories.tsx
+│   ├── Timer.tsx                     - Countdown with SVG progress ring
+│   ├── Timer.stories.tsx
+│   ├── PromptCard.tsx                - Themed prompt card (4 variants)
+│   ├── PromptCard.stories.tsx
+│   ├── ResponseInput.tsx             - Polymorphic input (text/multiple-choice/ranking)
+│   ├── ResponseInput.stories.tsx
+│   ├── RevealPhase.tsx               - Sequential animated item reveal
+│   ├── RevealPhase.stories.tsx
+│   ├── GameProgress.tsx              - Progress indicator (bar/dots/number)
+│   ├── GameProgress.stories.tsx
+│   ├── VotingInterface.tsx           - Voting UI with results display
+│   └── VotingInterface.stories.tsx
+└── utils/
+    └── colorHash.ts                  - Deterministic color & initials from player name
 
 __tests__/
 ├── client/
@@ -48,7 +70,15 @@ __tests__/
 │   ├── usePhase.test.ts
 │   └── useBonfireEvent.test.ts
 ├── components/
-│   └── BonfireErrorBoundary.test.tsx
+│   ├── BonfireErrorBoundary.test.tsx
+│   ├── Lobby.test.tsx
+│   ├── PlayerAvatar.test.tsx
+│   ├── Timer.test.tsx
+│   ├── PromptCard.test.tsx
+│   ├── ResponseInput.test.tsx
+│   ├── RevealPhase.test.tsx
+│   ├── GameProgress.test.tsx
+│   └── VotingInterface.test.tsx
 └── fixtures/
     ├── mockBonfireClient.ts          - Mock client for testing
     └── renderWithProvider.tsx        - Test render utility

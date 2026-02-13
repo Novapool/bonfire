@@ -2,7 +2,7 @@
 
 React hooks and utilities for building Bonfire party game UIs.
 
-**Status:** Milestone 4 Complete - 8 test files, 55 tests, 90.81% coverage
+**Status:** Milestone 4 Complete + Milestone 5 UI Components Complete - 205 tests, all passing
 
 ---
 
@@ -12,6 +12,10 @@ React hooks and utilities for building Bonfire party game UIs.
 - **BonfireProvider** - React context provider with auto-connect/cleanup
 - **6 React hooks** - Type-safe hooks for state, connection, room, player, phase, and events
 - **BonfireErrorBoundary** - Error boundary component for graceful error handling
+- **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
+- **colorHash utility** - Deterministic player color generation
+- **Storybook 8** - Visual documentation for all components
+- **Tailwind CSS v4** - Design system with party-game tokens
 - **useSyncExternalStore** - Native React 18 external state synchronization
 - **TypeScript** - Full type safety for game state and events
 - **Comprehensive tests** - MockBonfireClient for easy testing
@@ -502,6 +506,251 @@ interface BonfireErrorBoundaryProps {
 >
   <GameUI />
 </BonfireErrorBoundary>
+```
+
+---
+
+## UI Components
+
+Pre-built React components for common party game UI patterns. Requires Tailwind CSS v4 (included in the package) and running `npm run build:css`.
+
+### PlayerAvatar
+
+Renders a player's avatar as a colored circle with initials. Color is deterministically generated from the player's name.
+
+```tsx
+import { PlayerAvatar } from '@bonfire/client';
+
+<PlayerAvatar
+  name="Alice"
+  size="md"          // 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  showStatus={true}
+  isOnline={true}
+  isHost={true}
+/>
+```
+
+### Timer
+
+Countdown timer with an optional circular SVG progress ring.
+
+```tsx
+import { Timer } from '@bonfire/client';
+
+<Timer
+  duration={60}           // seconds
+  onComplete={() => nextPhase()}
+  showProgress={true}
+  variant="default"       // 'default' | 'warning' | 'danger'
+  size="md"               // 'sm' | 'md' | 'lg'
+  autoStart={true}
+/>
+```
+
+### Lobby
+
+Full pre-built lobby screen. Connects to game state via hooks internally — no wiring required.
+
+```tsx
+import { Lobby } from '@bonfire/client';
+
+// Minimal usage — reads room code and players from game state automatically
+<Lobby />
+
+// With overrides
+<Lobby
+  roomCode="ABC123"
+  showReadyStates={true}
+  hideStartButton={false}
+  onStart={() => customStart()}
+  renderPlayer={(player, isHost) => <MyPlayerRow player={player} isHost={isHost} />}
+/>
+```
+
+### PromptCard
+
+Themed card for displaying questions, prompts, or dares.
+
+```tsx
+import { PromptCard } from '@bonfire/client';
+
+<PromptCard
+  prompt="What is your biggest fear?"
+  variant="spicy"        // 'standard' | 'spicy' | 'creative' | 'dare'
+  category="Deep Dive"   // overrides the variant badge label
+  round={2}
+  totalRounds={5}
+  subtitle="Everyone answers, then compare."
+  animate={true}
+/>
+```
+
+### ResponseInput
+
+Polymorphic input component — mode is determined by `config.type`.
+
+```tsx
+import { ResponseInput } from '@bonfire/client';
+
+// Text input
+<ResponseInput
+  config={{ type: 'text', placeholder: 'Type your answer…', maxLength: 200, multiline: false }}
+  value={answer}
+  onChange={setAnswer}
+  onSubmit={handleSubmit}
+/>
+
+// Multiple choice (single-select)
+<ResponseInput
+  config={{
+    type: 'multiple-choice',
+    choices: [
+      { id: 'a', label: 'Option A', description: 'The first option' },
+      { id: 'b', label: 'Option B' },
+    ],
+    allowMultiple: false,
+  }}
+  value={selected}
+  onChange={setSelected}
+  onSubmit={handleSubmit}
+/>
+
+// Ranking
+<ResponseInput
+  config={{
+    type: 'ranking',
+    items: [
+      { id: 'p1', label: 'Alice' },
+      { id: 'p2', label: 'Bob' },
+      { id: 'p3', label: 'Charlie' },
+    ],
+  }}
+  value={ranking}
+  onChange={setRanking}
+  onSubmit={handleSubmit}
+/>
+```
+
+### Composing PromptCard + ResponseInput
+
+The `PromptCard` children slot is designed for `ResponseInput`:
+
+```tsx
+<PromptCard prompt="Rank these from best to worst" variant="creative" round={1} totalRounds={3}>
+  <ResponseInput
+    config={{ type: 'ranking', items: choices }}
+    value={ranking}
+    onChange={setRanking}
+    onSubmit={handleSubmit}
+  />
+</PromptCard>
+```
+
+### RevealPhase
+
+Sequentially reveals a list of items with configurable animation delays. Useful for answer reveals, score announcements, or any staged disclosure pattern.
+
+```tsx
+import { RevealPhase } from '@bonfire/client';
+
+<RevealPhase
+  items={[
+    { id: '1', content: 'Alice answered: Spaghetti' },
+    { id: '2', content: 'Bob answered: Pizza' },
+  ]}
+  delayBetween={800}             // ms between each reveal (default: 600)
+  animateIn={true}               // slide-in animation (default: true)
+  onRevealComplete={() => nextPhase()}
+/>
+```
+
+Custom render per item:
+
+```tsx
+<RevealPhase
+  items={answers}
+  renderItem={(item, index) => (
+    <div className="answer-card">
+      <span className="rank">#{index + 1}</span>
+      <span>{item.content}</span>
+    </div>
+  )}
+  delayBetween={1000}
+  onRevealComplete={handleComplete}
+/>
+```
+
+### GameProgress
+
+Displays current progress through rounds or phases. Supports three visual variants.
+
+```tsx
+import { GameProgress } from '@bonfire/client';
+
+// Progress bar
+<GameProgress
+  current={2}
+  total={5}
+  variant="bar"          // 'bar' | 'dots' | 'number'
+  label="Round"
+/>
+
+// Dot indicators
+<GameProgress current={3} total={5} variant="dots" />
+
+// Numeric display
+<GameProgress current={3} total={5} variant="number" label="Question" />
+```
+
+All variants include an ARIA `progressbar` role for accessibility.
+
+### VotingInterface
+
+Full voting UI with live results display, vote counts, percentage bars, and winner highlighting.
+
+```tsx
+import { VotingInterface } from '@bonfire/client';
+
+// Voting in progress
+<VotingInterface
+  options={[
+    { id: 'a', label: 'Option A' },
+    { id: 'b', label: 'Option B' },
+    { id: 'c', label: 'Option C' },
+  ]}
+  onVote={(optionId) => sendAction({ type: 'vote', payload: { optionId } })}
+  selectedId={myVoteId}
+  disabled={hasVoted}
+/>
+
+// Results display (after voting closes)
+<VotingInterface
+  options={[
+    { id: 'a', label: 'Option A', votes: 3 },
+    { id: 'b', label: 'Option B', votes: 7 },
+    { id: 'c', label: 'Option C', votes: 1 },
+  ]}
+  showResults={true}
+  totalVotes={11}
+/>
+```
+
+### colorHash Utility
+
+```typescript
+import { getPlayerColor, getPlayerInitials } from '@bonfire/client';
+
+getPlayerColor('Alice')     // '#...' — deterministic hex color
+getPlayerInitials('Alice')  // 'AL'
+getPlayerInitials('Bob')    // 'B'
+```
+
+### Storybook
+
+Run the interactive component playground:
+
+```bash
+cd packages/client && npm run storybook
 ```
 
 ---

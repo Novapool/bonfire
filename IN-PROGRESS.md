@@ -1,37 +1,42 @@
 # IN-PROGRESS - Bonfire
 
-**Last Updated:** February 12, 2026 (Milestone 5 Complete)
+**Last Updated:** February 17, 2026 (Milestone 6 Started)
 
 ---
 
 ## Current Work
 
-### Milestone 6 - First Game: Intimacy Ladder v2 (NOT STARTED)
-- Status: 🔴 Not Started
+### Milestone 6 - First Game: Intimacy Ladder v2 (IN PROGRESS)
+- Status: 🟡 In Progress — scaffolding done, implementation next
 - Goal: Build a complete game using the framework to validate abstractions
+- Location: `~/Documents/Programs/LOIV2/` (standalone project)
 
 ---
 
 ## Active Plan
 
-No active plan. Milestone 5 is complete. Ready to begin Milestone 6.
+LOIV2 is a standalone project that consumes Bonfire as a dependency via local `file:` references.
+It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed for implementation.
 
-**Milestone 6 Tasks (from MILESTONES.md):**
-- Port Intimacy Ladder to new framework
-- Implement progressive disclosure mechanic
-- Add reflection phase between rounds
-- Create question database with levels
-- Build mobile-responsive UI
-- Add game settings (customize levels, time limits)
-- Implement "skip question" functionality
-- Test with real users, gather feedback
-- Document pain points in framework usage
+**Next implementation steps (work in LOIV2):**
+1. Implement `IntimacyLadderGame` in `LOIV2/server/src/game.ts`
+2. Wire up `SocketServer` in `LOIV2/server/src/index.ts`
+3. Build React screens in `LOIV2/client/src/screens/`
 
 ---
 
 ## Recently Completed
 
-1. **Milestone 5 - UI Components Phase 4** (Feb 12, 2026)
+1. **Milestone 6 - LOIV2 Project Scaffolded** (Feb 17, 2026)
+   - Created `~/Documents/Programs/LOIV2/` as standalone project
+   - Ported question bank (5 levels, ~200 questions) from LOI v1 to TypeScript
+   - Wrote complete game design doc: state model, player actions, turn flow
+   - Wrote architecture doc: how game uses Bonfire layers
+   - Wrote curated Bonfire docs (server-setup + client-api) for LOIV2 sessions
+   - Set up package.json with `file:` references to Bonfire packages
+   - Created placeholder entry points ready for implementation
+
+2. **Milestone 5 - UI Components Phase 4** (Feb 12, 2026)
    - Built `<RevealPhase>` - Sequential animated reveal for answers/players, supports custom renderItem, configurable delay, onRevealComplete callback
    - Built `<GameProgress>` - Progress indicator with bar/dots/number variants, all with ARIA progressbar role
    - Built `<VotingInterface>` - Full voting UI with results display, vote counts, percentages, winner highlighting

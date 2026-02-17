@@ -284,22 +284,28 @@
 
 ---
 
-## Milestone 6: First Game - Intimacy Ladder v2 🔴
+## Milestone 6: First Game - Intimacy Ladder v2 🟡
 
 **Goal:** Build complete game using the framework to validate abstractions
 
 ### Tasks
-- [ ] 🔴 Port Intimacy Ladder to new framework
-- [ ] 🔴 Implement progressive disclosure mechanic
-- [ ] 🔴 Add reflection phase between rounds
-- [ ] 🔴 Create question database with levels
-- [ ] 🔴 Build mobile-responsive UI
-- [ ] 🔴 Add game settings (customize levels, time limits)
-- [ ] 🔴 Implement "skip question" functionality
+- [x] 🟢 Create LOIV2 project structure with curated Bonfire docs
+- [x] 🟢 Port question database to TypeScript (levels 1–5, ~200 questions)
+- [x] 🟢 Write GAME_DESIGN.md — state model, player actions, turn flow
+- [x] 🟢 Write ARCHITECTURE.md — how game uses Bonfire layers
+- [x] 🟢 Write docs/bonfire/ — curated server-setup and client-api guides
+- [ ] 🔴 Implement `IntimacyLadderGame` extending `SocialGame`
+- [ ] 🔴 Implement progressive disclosure mechanic (descending levels)
+- [ ] 🔴 Add reflection phase between levels
+- [ ] 🔴 Build mobile-responsive UI (screens: Lobby, Select, Answer, Finished)
+- [ ] 🔴 Add game settings (start level, questions per level)
+- [ ] 🔴 Implement reroll/skip question functionality
 - [ ] 🔴 Test with real users, gather feedback
 - [ ] 🔴 Document pain points in framework usage
 
 **Deliverable:** Fully functional Intimacy Ladder game proving framework works
+
+**Location:** `~/Documents/Programs/LOIV2/` (standalone project, not in this monorepo)
 
 ---
 

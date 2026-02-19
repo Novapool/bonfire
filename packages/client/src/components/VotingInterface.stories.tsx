@@ -52,7 +52,7 @@ export const Interactive: Story = {
           onVote={setVote}
         />
         {vote && (
-          <p className="mt-4 text-sm text-center text-text-secondary">
+          <p className="mt-4 text-sm text-center text-gray-500">
             You voted for: <strong>{options.find((o) => o.id === vote)?.label}</strong>
           </p>
         )}

@@ -28,7 +28,7 @@ const BarProgress: React.FC<{ current: number; total: number }> = ({ current, to
         aria-label={`Progress: ${current} of ${total}`}
       >
         <div
-          className="h-full bg-brand-primary rounded-full transition-all duration-500"
+          className="h-full bg-indigo-500 rounded-full transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -55,7 +55,7 @@ const DotsProgress: React.FC<{ current: number; total: number }> = ({ current, t
           aria-hidden="true"
           className={`
             rounded-full transition-all duration-300
-            ${active ? 'w-3 h-3 bg-brand-primary' : done ? 'w-2.5 h-2.5 bg-brand-primary/50' : 'w-2.5 h-2.5 bg-gray-300'}
+            ${active ? 'w-3 h-3 bg-indigo-500' : done ? 'w-2.5 h-2.5 bg-indigo-500/50' : 'w-2.5 h-2.5 bg-gray-300'}
           `.trim()}
         />
       );
@@ -72,8 +72,8 @@ const NumberProgress: React.FC<{ current: number; total: number }> = ({ current,
     aria-valuemax={total}
     aria-label={`Round ${current} of ${total}`}
   >
-    <span className="text-3xl font-bold text-brand-primary">{current}</span>
-    <span className="text-lg text-text-secondary font-medium">/ {total}</span>
+    <span className="text-3xl font-bold text-indigo-500">{current}</span>
+    <span className="text-lg text-gray-500 font-medium">/ {total}</span>
   </div>
 );
 
@@ -93,7 +93,7 @@ export const GameProgress: React.FC<GameProgressProps> = ({
     {variant === 'dots' && <DotsProgress current={current} total={total} />}
     {variant === 'number' && <NumberProgress current={current} total={total} />}
     {label && (
-      <p className="text-xs text-center text-text-secondary">{label}</p>
+      <p className="text-xs text-center text-gray-500">{label}</p>
     )}
   </div>
 );

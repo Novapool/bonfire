@@ -24,9 +24,9 @@ const sizeClasses = {
 };
 
 const variantColors = {
-  default: 'text-brand-primary',
-  warning: 'text-warning',
-  danger: 'text-error',
+  default: 'text-indigo-500',
+  warning: 'text-amber-500',
+  danger: 'text-red-500',
 };
 
 const progressColors = {

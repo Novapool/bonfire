@@ -95,14 +95,14 @@ export const CustomRender: Story = {
     revealAll: true,
     renderItem: (item, index, revealed) => (
       <div
-        className={`flex items-center gap-3 p-4 rounded-xl bg-surface border-2 transition-all duration-500 ${
+        className={`flex items-center gap-3 p-4 rounded-xl bg-white border-2 transition-all duration-500 ${
           revealed ? 'border-yellow-300 opacity-100' : 'border-transparent opacity-0'
         }`}
         aria-hidden={!revealed}
       >
         <span className="text-2xl">{['🥇', '🥈', '🥉', '4️⃣'][index] ?? `${index + 1}`}</span>
-        <span className="flex-1 font-bold text-text-primary">{item.label}</span>
-        <span className="font-mono font-semibold text-brand-primary">{item.meta}</span>
+        <span className="flex-1 font-bold text-gray-900">{item.label}</span>
+        <span className="font-mono font-semibold text-indigo-500">{item.meta}</span>
       </div>
     ),
   },

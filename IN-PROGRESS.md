@@ -1,6 +1,6 @@
 # IN-PROGRESS - Bonfire
 
-**Last Updated:** February 17, 2026 (Milestone 6 Started)
+**Last Updated:** February 19, 2026 (LOIV2 bug fixes applied to Bonfire)
 
 ---
 
@@ -27,7 +27,18 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 ## Recently Completed
 
-1. **Milestone 6 - LOIV2 Project Scaffolded** (Feb 17, 2026)
+1. **Bonfire Bug Fixes from LOIV2** (Feb 19, 2026)
+   - ✅ `SocketServer.handleGameAction` — was a stub, now properly delegates to `room.game.handleAction(action)` (already fixed)
+   - ✅ **UI components Tailwind tokens** — replaced all Bonfire-specific tokens (`bg-surface`, `text-brand-primary`, `text-text-secondary`, etc.) with standard Tailwind equivalents (`bg-white`, `text-indigo-500`, `text-gray-500`, etc.) in all 8 components + stories
+   - ✅ **API documentation** — fixed incorrect signatures in README.md, architecture doc, CLAUDE.md:
+     - `usePlayer()`: key is `player` not `currentPlayer`
+     - `sendAction(type, payload)`: two args, not one object
+     - `usePhase()`: returns value directly, not `{ phase }`
+     - `BonfireProvider`: uses `config` prop, not `serverUrl`
+   - ✅ **Vite CJS interop** — added `optimizeDeps` + `commonjsOptions` config to README
+   - ✅ **Build order** — documented that Bonfire packages must be built before game project install
+
+2. **Milestone 6 - LOIV2 Project Scaffolded** (Feb 17, 2026)
    - Created `~/Documents/Programs/LOIV2/` as standalone project
    - Ported question bank (5 levels, ~200 questions) from LOI v1 to TypeScript
    - Wrote complete game design doc: state model, player actions, turn flow
@@ -63,7 +74,10 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 ## Blockers
 
-*None currently*
+**Missing features every game needs (not yet built):**
+- `this.broadcastEvent(type, payload)` on SocialGame — no clean way to push one-time events to clients; `synchronizer.broadcastEvent()` is untyped, undocumented, can be null
+- `playerOrder` in base GameState — every turn-based game needs this; add to GameState or ship a TurnManager utility
+- UI components need `style`/`className` override support for custom visuals (or convert to inline with theme prop)
 
 ---
 

@@ -72,7 +72,7 @@ const TextInput: React.FC<TextInputProps> = ({ config, value, onChange, onSubmit
     disabled,
     maxLength: config.maxLength,
     placeholder: config.placeholder || 'Type your answer…',
-    className: `w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-brand-primary focus:outline-none transition-colors text-text-primary placeholder:text-text-secondary disabled:opacity-50 disabled:cursor-not-allowed bg-surface`,
+    className: `w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors text-gray-900 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed bg-white`,
     'aria-label': 'Your response',
   };
 
@@ -80,7 +80,7 @@ const TextInput: React.FC<TextInputProps> = ({ config, value, onChange, onSubmit
     <div>
       <textarea {...sharedProps} rows={3} />
       {config.maxLength && (
-        <div className="text-right text-xs text-text-secondary mt-1">
+        <div className="text-right text-xs text-gray-500 mt-1">
           {value.length} / {config.maxLength}
         </div>
       )}
@@ -89,7 +89,7 @@ const TextInput: React.FC<TextInputProps> = ({ config, value, onChange, onSubmit
     <div>
       <input type="text" {...sharedProps} />
       {config.maxLength && (
-        <div className="text-right text-xs text-text-secondary mt-1">
+        <div className="text-right text-xs text-gray-500 mt-1">
           {value.length} / {config.maxLength}
         </div>
       )}
@@ -127,15 +127,15 @@ const MultipleChoiceInput: React.FC<MultipleChoiceInputProps> = ({ config, value
             className={`
               w-full text-left px-4 py-3 rounded-lg border-2 transition-all
               ${selected
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary font-semibold'
-                : 'border-gray-200 bg-surface text-text-primary hover:border-brand-primary/50'
+                ? 'border-indigo-500 bg-indigo-50 text-indigo-600 font-semibold'
+                : 'border-gray-200 bg-white text-gray-900 hover:border-indigo-300'
               }
               disabled:opacity-50 disabled:cursor-not-allowed
             `.trim()}
           >
             <span className="font-medium">{choice.label}</span>
             {choice.description && (
-              <span className="block text-sm text-text-secondary font-normal mt-0.5">
+              <span className="block text-sm text-gray-500 font-normal mt-0.5">
                 {choice.description}
               </span>
             )}
@@ -188,21 +188,21 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
           {ranked.map((item, index) => (
             <div
               key={item.id}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-brand-primary/30 bg-brand-primary/5"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-indigo-200 bg-indigo-50"
             >
-              <span className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+              <span className="w-6 h-6 rounded-full bg-indigo-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
                 {index + 1}
               </span>
-              <span className="flex-1 text-text-primary font-medium">{item.label}</span>
+              <span className="flex-1 text-gray-900 font-medium">{item.label}</span>
               <div className="flex gap-1">
                 <button
                   type="button"
                   onClick={() => moveUp(index)}
                   disabled={disabled || index === 0}
                   aria-label={`Move ${item.label} up`}
-                  className="p-1 rounded hover:bg-brand-primary/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1 rounded hover:bg-indigo-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
-                  <svg className="w-4 h-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                   </svg>
                 </button>
@@ -211,9 +211,9 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
                   onClick={() => moveDown(index)}
                   disabled={disabled || index === ranked.length - 1}
                   aria-label={`Move ${item.label} down`}
-                  className="p-1 rounded hover:bg-brand-primary/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-1 rounded hover:bg-indigo-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
-                  <svg className="w-4 h-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -238,7 +238,7 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
       {unranked.length > 0 && (
         <div className="space-y-2">
           {ranked.length > 0 && (
-            <p className="text-xs text-text-secondary">Tap to add to ranking:</p>
+            <p className="text-xs text-gray-500">Tap to add to ranking:</p>
           )}
           {unranked.map((item) => (
             <button
@@ -247,7 +247,7 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
               onClick={() => !disabled && addToRanking(item.id)}
               disabled={disabled}
               aria-label={`Add ${item.label} to ranking`}
-              className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 bg-surface text-text-secondary hover:border-brand-primary/50 hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 bg-white text-gray-500 hover:border-indigo-300 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -330,7 +330,7 @@ export const ResponseInput: React.FC<ResponseInputProps> = ({
           className={`
             w-full py-3 px-6 rounded-lg font-semibold transition-all
             ${canSubmit && !disabled
-              ? 'bg-brand-primary text-white hover:bg-brand-secondary cursor-pointer'
+              ? 'bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }
           `.trim()}

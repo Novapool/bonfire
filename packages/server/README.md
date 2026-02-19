@@ -259,18 +259,22 @@ Get current server statistics.
 const stats = server.getStats()
 console.log(stats)
 // {
-//   roomCount: 5,
-//   playerCount: 12,
-//   uptime: 3600000 // milliseconds
+//   totalRooms: 5,
+//   totalPlayers: 12,
+//   roomsByStatus: { waiting: 2, playing: 3, ended: 0, closed: 0 },
+//   uptime: 3600000, // milliseconds
+//   memoryUsage: { rss: ..., heapUsed: ..., ... }
 // }
 ```
 
 **Returns:**
 ```typescript
 interface ServerStats {
-  roomCount: number
-  playerCount: number
+  totalRooms: number
+  totalPlayers: number
+  roomsByStatus: Record<string, number>
   uptime: number
+  memoryUsage: NodeJS.MemoryUsage
 }
 ```
 
@@ -435,9 +439,11 @@ Get server statistics.
 ```bash
 curl -H "x-api-key: your-secret-key" http://localhost:3000/admin/stats
 # {
-#   "roomCount": 5,
-#   "playerCount": 12,
-#   "uptime": 3600000
+#   "totalRooms": 5,
+#   "totalPlayers": 12,
+#   "roomsByStatus": { "waiting": 2, "playing": 3, "ended": 0, "closed": 0 },
+#   "uptime": 3600000,
+#   "memoryUsage": { "rss": 52428800, "heapUsed": 18874368 }
 # }
 ```
 

@@ -28,6 +28,12 @@ React hooks and utilities for building Bonfire party game UIs.
 npm install @bonfire/client socket.io-client
 ```
 
+> **Build order matters:** When using local `file:` references, build the Bonfire packages first before running your game app:
+> ```bash
+> cd bonfire && npm run build   # build @bonfire/core, /server, /client first
+> cd ../my-game && npm install  # then install
+> ```
+
 **Dependencies:**
 - `@bonfire/core` - Core types and interfaces
 - `socket.io-client` - Realtime communication
@@ -48,7 +54,7 @@ import { GameState } from '@bonfire/core';
 // Option A: Pass config (provider creates client)
 function App() {
   return (
-    <BonfireProvider serverUrl="http://localhost:3000">
+    <BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
       <GameUI />
     </BonfireProvider>
   );
@@ -75,7 +81,7 @@ function GameUI() {
   const { state } = useGameState();
   const { status } = useConnection();
   const { createRoom, joinRoom, startGame } = useRoom();
-  const { currentPlayer, isHost } = usePlayer();
+  const { player, isHost } = usePlayer();
 
   if (status !== 'connected') {
     return <div>Connecting...</div>;
@@ -115,7 +121,7 @@ import { BonfireErrorBoundary } from '@bonfire/client';
 
 function App() {
   return (
-    <BonfireProvider serverUrl="http://localhost:3000">
+    <BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
       <BonfireErrorBoundary
         fallback={<div>Something went wrong. <button onClick={() => window.location.reload()}>Reload</button></div>}
       >
@@ -157,7 +163,7 @@ await client.leaveRoom(): Promise<BaseResponse>
 
 // Game Actions
 await client.startGame(): Promise<BaseResponse>
-await client.sendAction(action: PlayerAction): Promise<ActionResponse>
+await client.sendAction(actionType: string, payload: unknown): Promise<ActionResponse>
 await client.requestState(): Promise<StateResponse>
 
 // Subscriptions (return unsubscribe functions)
@@ -189,7 +195,7 @@ interface BonfireProviderProps {
   client?: BonfireClient;
 
   // Option 2: Pass config (provider creates client)
-  serverUrl?: string;
+  config?: BonfireClientConfig; // { serverUrl: string; autoConnect?: boolean }
   autoConnect?: boolean;
 
   children: React.ReactNode;
@@ -199,8 +205,8 @@ interface BonfireProviderProps {
 **Example:**
 
 ```tsx
-// Simple setup
-<BonfireProvider serverUrl="http://localhost:3000">
+// Simple setup — note: use config prop, not serverUrl directly
+<BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
   <App />
 </BonfireProvider>
 
@@ -315,11 +321,12 @@ Room management and game actions.
 ```typescript
 function useRoom(): {
   roomId: string | null;
-  createRoom: () => Promise<void>;
-  joinRoom: (roomId: string, playerName: string) => Promise<void>;
-  leaveRoom: () => Promise<void>;
-  startGame: () => Promise<void>;
-  sendAction: (action: PlayerAction) => Promise<void>;
+  isInRoom: boolean;
+  createRoom: (gameType: string, hostName: string) => Promise<RoomCreateResponse>;
+  joinRoom: (roomId: string, playerName: string) => Promise<RoomJoinResponse>;
+  leaveRoom: () => Promise<BaseResponse>;
+  startGame: () => Promise<BaseResponse>;
+  sendAction: (actionType: string, payload: unknown) => Promise<ActionResponse>;
 }
 ```
 
@@ -361,10 +368,8 @@ function GameControls() {
 
   const submitAnswer = async (answer: string) => {
     try {
-      await sendAction({
-        type: 'submit_answer',
-        payload: { answer }
-      });
+      // sendAction takes two args: actionType string + payload object
+      await sendAction('submit_answer', { answer });
     } catch (error) {
       console.error('Failed to submit answer:', error);
     }
@@ -382,7 +387,8 @@ Access current player information and player list.
 
 ```typescript
 function usePlayer(): {
-  currentPlayer: Player | null;
+  player: Player | null;  // The current player (NOT currentPlayer)
+  playerId: string | null;
   players: Player[];
   isHost: boolean;
 }
@@ -392,17 +398,17 @@ function usePlayer(): {
 
 ```tsx
 function PlayerList() {
-  const { currentPlayer, players, isHost } = usePlayer();
+  const { player, players, isHost } = usePlayer();
 
   return (
     <div>
       <h3>Players ({players.length})</h3>
       <ul>
-        {players.map((player) => (
-          <li key={player.id}>
-            {player.name}
-            {player.id === currentPlayer?.id && ' (You)'}
-            {player.isHost && ' 👑'}
+        {players.map((p) => (
+          <li key={p.id}>
+            {p.name}
+            {p.id === player?.id && ' (You)'}
+            {p.isHost && ' 👑'}
           </li>
         ))}
       </ul>
@@ -417,24 +423,21 @@ function PlayerList() {
 
 #### usePhase()
 
-Track current game phase with helper for conditional rendering.
+Track current game phase.
 
 ```typescript
-function usePhase(): {
-  phase: Phase | null;
-  isPhase: (targetPhase: Phase) => boolean;
-}
+function usePhase(): Phase | null  // Returns the value directly, not an object
 ```
 
 **Example:**
 
 ```tsx
 function GameScreen() {
-  const { phase, isPhase } = usePhase();
+  const phase = usePhase();  // Direct value, not { phase }
 
-  if (isPhase('lobby')) return <LobbyUI />;
-  if (isPhase('playing')) return <GameplayUI />;
-  if (isPhase('results')) return <ResultsUI />;
+  if (phase === 'lobby') return <LobbyUI />;
+  if (phase === 'playing') return <GameplayUI />;
+  if (phase === 'results') return <ResultsUI />;
 
   return <div>Unknown phase: {phase}</div>;
 }
@@ -877,7 +880,7 @@ import { BonfireProvider, useGameState, useRoom, usePlayer, usePhase } from '@bo
 
 function App() {
   return (
-    <BonfireProvider serverUrl="http://localhost:3000">
+    <BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
       <BonfireErrorBoundary>
         <Game />
       </BonfireErrorBoundary>
@@ -887,7 +890,7 @@ function App() {
 
 function Game() {
   const { state } = useGameState();
-  const { phase } = usePhase();
+  const phase = usePhase();
 
   if (!state) return <LobbyScreen />;
   if (phase === 'lobby') return <WaitingRoom />;
@@ -915,7 +918,7 @@ function LobbyScreen() {
 
 function WaitingRoom() {
   const { state } = useGameState();
-  const { players, isHost } = usePlayer();
+  const { player, players, isHost } = usePlayer();
   const { startGame } = useRoom();
 
   return (
@@ -938,7 +941,7 @@ function Gameplay() {
   return (
     <div>
       <h2>Playing...</h2>
-      <button onClick={() => sendAction({ type: 'submit', payload: 'answer' })}>
+      <button onClick={() => sendAction('submit', { answer: 'my answer' })}>
         Submit Answer
       </button>
     </div>
@@ -955,6 +958,44 @@ function Results() {
     </div>
   );
 }
+```
+
+---
+
+---
+
+## Common Gotchas
+
+These cause silent failures with no helpful error message:
+
+| Issue | Correct Usage |
+|-------|---------------|
+| `usePlayer()` key is `player`, not `currentPlayer` | `const { player } = usePlayer()` |
+| `sendAction` takes two args, not an object | `sendAction('type', payload)` |
+| `usePhase()` returns the value directly | `const phase = usePhase()` |
+| `handleAction()` receives a single object; player is inside | `action.playerId` |
+| `BonfireProvider` config prop, not `serverUrl` | `config={{ serverUrl }}` |
+| `onGameStart()` does NOT auto-transition phases | call `transitionPhase()` yourself |
+| `transitionPhase()` throws if phase not in `config.phases` | list ALL phases upfront in config |
+
+---
+
+## Vite Setup (Required)
+
+When using Bonfire packages from a Vite app, add this to your `vite.config.ts` to avoid "does not provide an export named" errors:
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  optimizeDeps: {
+    include: ['@bonfire/client', '@bonfire/core'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/@bonfire\//, /node_modules/],
+    },
+  },
+});
 ```
 
 ---

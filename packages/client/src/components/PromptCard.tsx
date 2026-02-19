@@ -25,29 +25,29 @@ export interface PromptCardProps {
 
 const variantConfig: Record<PromptVariant, { bg: string; border: string; badge: string; badgeText: string; icon: string }> = {
   standard: {
-    bg: 'bg-surface',
-    border: 'border-brand-primary/30',
-    badge: 'bg-brand-primary/10 text-brand-primary',
+    bg: 'bg-white',
+    border: 'border-indigo-200',
+    badge: 'bg-indigo-50 text-indigo-600',
     badgeText: 'Standard',
     icon: '💬',
   },
   spicy: {
-    bg: 'bg-surface',
-    border: 'border-red-400/40',
+    bg: 'bg-white',
+    border: 'border-red-200',
     badge: 'bg-red-100 text-red-700',
     badgeText: 'Spicy',
     icon: '🌶️',
   },
   creative: {
-    bg: 'bg-surface',
-    border: 'border-purple-400/40',
+    bg: 'bg-white',
+    border: 'border-purple-200',
     badge: 'bg-purple-100 text-purple-700',
     badgeText: 'Creative',
     icon: '🎨',
   },
   dare: {
-    bg: 'bg-surface',
-    border: 'border-orange-400/40',
+    bg: 'bg-white',
+    border: 'border-orange-200',
     badge: 'bg-orange-100 text-orange-700',
     badgeText: 'Dare',
     icon: '⚡',
@@ -67,16 +67,15 @@ export const PromptCard: React.FC<PromptCardProps> = ({
   subtitle,
   children,
   className = '',
-  animate = false,
+  animate: _animate = false,
 }) => {
   const config = variantConfig[variant];
 
   return (
     <div
       className={`
-        rounded-xl border-2 shadow-card p-6
+        rounded-xl border-2 shadow-md p-6
         ${config.bg} ${config.border}
-        ${animate ? 'animate-slide-up' : ''}
         ${className}
       `.trim()}
       role="article"
@@ -85,7 +84,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
       {/* Header: round info and variant badge */}
       <div className="flex items-center justify-between mb-4">
         {round !== undefined ? (
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-gray-500">
             Round {round}{totalRounds !== undefined ? ` of ${totalRounds}` : ''}
           </span>
         ) : (
@@ -100,13 +99,13 @@ export const PromptCard: React.FC<PromptCardProps> = ({
       </div>
 
       {/* Prompt text */}
-      <p className="text-xl font-semibold text-center leading-relaxed text-text-primary mb-2">
+      <p className="text-xl font-semibold text-center leading-relaxed text-gray-900 mb-2">
         {prompt}
       </p>
 
       {/* Subtitle / instructions */}
       {subtitle && (
-        <p className="text-sm text-center text-text-secondary mt-2">{subtitle}</p>
+        <p className="text-sm text-center text-gray-500 mt-2">{subtitle}</p>
       )}
 
       {/* Additional slot content */}

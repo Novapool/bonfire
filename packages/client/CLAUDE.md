@@ -16,7 +16,7 @@ This package provides the client-side React integration for Bonfire games:
 - **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
 - **colorHash utility** - Deterministic player color generation from names
 - **Storybook 8** - Interactive component documentation
-- **Tailwind CSS v4** - Design system with `@theme` tokens
+- **Tailwind CSS** - Components use standard Tailwind utilities only (no custom tokens)
 - **MockBonfireClient** - Test utility for simulating client behavior
 
 ---
@@ -147,15 +147,20 @@ __tests__/
 
 **Basic setup:**
 ```tsx
-// 1. Wrap app with provider
-<BonfireProvider serverUrl="http://localhost:3000">
+// 1. Wrap app with provider — use config prop, not serverUrl
+<BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
   <App />
 </BonfireProvider>
 
 // 2. Use hooks in components
 const { state } = useGameState();
-const { createRoom, joinRoom } = useRoom();
+const { createRoom, joinRoom, sendAction } = useRoom();
 const { status } = useConnection();
+const { player, isHost } = usePlayer();  // key is 'player', not 'currentPlayer'
+const phase = usePhase();                // returns value directly, not { phase }
+
+// sendAction takes two args:
+sendAction('submit_answer', { text: 'my answer' });
 ```
 
 **State synchronization:**

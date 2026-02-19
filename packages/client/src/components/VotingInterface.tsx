@@ -41,11 +41,11 @@ const VoteBar: React.FC<VoteBarProps> = ({ count, total }) => {
     <div className="mt-2 space-y-0.5">
       <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
         <div
-          className="h-full bg-brand-primary rounded-full transition-all duration-500"
+          className="h-full bg-indigo-500 rounded-full transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className="flex justify-between text-xs text-text-secondary">
+      <div className="flex justify-between text-xs text-gray-500">
         <span>{count} vote{count !== 1 ? 's' : ''}</span>
         <span>{pct}%</span>
       </div>
@@ -79,7 +79,7 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
       aria-label={title || 'Vote options'}
     >
       {title && (
-        <h2 className="text-lg font-bold text-text-primary text-center mb-2">{title}</h2>
+        <h2 className="text-lg font-bold text-gray-900 text-center mb-2">{title}</h2>
       )}
 
       {options.map((option) => {
@@ -98,10 +98,10 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
             className={`
               w-full text-left px-5 py-4 rounded-xl border-2 transition-all
               ${selected
-                ? 'border-brand-primary bg-brand-primary/10'
+                ? 'border-indigo-500 bg-indigo-50'
                 : isWinner
                   ? 'border-yellow-400 bg-yellow-50'
-                  : 'border-gray-200 bg-surface hover:border-brand-primary/40'
+                  : 'border-gray-200 bg-white hover:border-indigo-200'
               }
               ${disabled && !showResults ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
             `.trim()}
@@ -109,21 +109,21 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <span
-                  className={`font-semibold block ${selected ? 'text-brand-primary' : isWinner ? 'text-yellow-700' : 'text-text-primary'}`}
+                  className={`font-semibold block ${selected ? 'text-indigo-600' : isWinner ? 'text-yellow-700' : 'text-gray-900'}`}
                 >
                   {isWinner && <span aria-hidden="true" className="mr-1">🏆</span>}
                   {option.label}
                 </span>
                 {option.description && (
-                  <span className="text-sm text-text-secondary block mt-0.5">{option.description}</span>
+                  <span className="text-sm text-gray-500 block mt-0.5">{option.description}</span>
                 )}
                 {option.author && (
-                  <span className="text-xs text-text-secondary block mt-0.5">— {option.author}</span>
+                  <span className="text-xs text-gray-500 block mt-0.5">— {option.author}</span>
                 )}
               </div>
               {selected && !showResults && (
                 <span
-                  className="w-5 h-5 rounded-full bg-brand-primary flex-shrink-0 flex items-center justify-center mt-0.5"
+                  className="w-5 h-5 rounded-full bg-indigo-500 flex-shrink-0 flex items-center justify-center mt-0.5"
                   aria-hidden="true"
                 >
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

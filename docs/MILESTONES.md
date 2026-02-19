@@ -224,7 +224,7 @@
   - `useConnection()` - Connection status tracking with `connect()`/`disconnect()` controls
   - `useRoom()` - Room management (create, join, leave, start) and `sendAction()`
   - `usePlayer()` - Derives current player, isHost, and player list from state
-  - `usePhase()` - Current phase with `isPhase()` helper for conditional rendering
+  - `usePhase()` - Current phase value (returns value directly: `const phase = usePhase()`)
   - `useBonfireEvent()` - Typed game event subscription with auto-cleanup
 - **BonfireErrorBoundary** - Error boundary component with static/render-function fallback and reset
 - **MockBonfireClient** - Test utility for simulating client behavior with state/event simulation methods

@@ -25,7 +25,7 @@ Plain TypeScript class (no React dependency) that manages the socket connection.
 - `joinRoom(roomId, playerName)` → `RoomJoinResponse`
 - `leaveRoom()` → `BaseResponse`
 - `startGame()` → `BaseResponse`
-- `sendAction(actionType, payload)` → `ActionResponse`
+- `sendAction(actionType: string, payload: unknown)` → `ActionResponse` — **two args, not one object**
 - `requestState()` → `StateResponse`
 
 **Subscription API** (each returns an unsubscribe function):
@@ -41,21 +41,22 @@ Plain TypeScript class (no React dependency) that manages the socket connection.
 
 React context provider that wraps the app tree.
 
-- Accepts `client` (pre-created) or `config` (creates internally)
+- Accepts `client` (pre-created) **or** `config` (creates client internally)
+- **Important:** use the `config` prop, not `serverUrl` — `<BonfireProvider config={{ serverUrl: '...' }}>`
 - `autoConnect` prop (default: true)
 - Subscribes to client state/status and triggers React re-renders
 - Exposes `useBonfireContext()` internal hook for all public hooks
 
 ## Hooks
 
-| Hook | Key Return Values | Pattern |
-|------|------------------|---------|
-| `useGameState<TState>()` | `state`, `requestState` | `useSyncExternalStore` |
-| `useConnection()` | `status`, `isConnected`, `connect`, `disconnect` | `useSyncExternalStore` |
-| `useRoom()` | `roomId`, `isInRoom`, `createRoom`, `joinRoom`, `leaveRoom`, `startGame`, `sendAction` | `useCallback` wrappers |
-| `usePlayer()` | `player`, `playerId`, `isHost`, `players` | `useMemo` derived from state |
-| `usePhase()` | `phase`, `isPhase(target)` | `useCallback` derived from state |
-| `useBonfireEvent(type, handler)` | void | `useEffect` with auto-cleanup |
+| Hook | Return Type / Key Values | Pattern |
+|------|--------------------------|---------|
+| `useGameState()` | `{ state, requestState }` | `useSyncExternalStore` |
+| `useConnection()` | `{ status, connect, disconnect }` | `useSyncExternalStore` |
+| `useRoom()` | `{ roomId, isInRoom, createRoom, joinRoom, leaveRoom, startGame, sendAction(type, payload) }` | `useCallback` wrappers |
+| `usePlayer()` | `{ player, playerId, isHost, players }` — key is `player`, not `currentPlayer` | `useMemo` derived from state |
+| `usePhase()` | `Phase \| null` — returns value directly, **not** `{ phase }` | `useMemo` derived from state |
+| `useBonfireEvent(type, handler)` | `void` | `useEffect` with auto-cleanup |
 
 ### Why `useSyncExternalStore`
 
@@ -78,18 +79,18 @@ The client package **does not depend on `@bonfire/server`**. Server response typ
 
 ## UI Components (Milestone 5)
 
-Pre-built React components for common party game UI patterns. All components use Tailwind CSS v4 design tokens defined in the package's `@theme` configuration.
+Pre-built React components for common party game UI patterns. Components use standard Tailwind CSS utility classes — no custom design tokens required. Consumers only need a standard Tailwind setup.
 
 ### Design System
 
-The package ships a Tailwind CSS v4 design system with tokens for:
-- **Brand colors**: `brand-primary`, `brand-secondary`
-- **Surface/background**: `bg-surface`
-- **Text hierarchy**: `text-primary`, `text-secondary`
-- **Status colors**: `warning`, `error`
-- **Animations**: `animate-slide-up`, `shadow-card`
+Components use standard Tailwind color palette (indigo for brand, gray for surfaces/text). No custom `@theme` tokens are used. The package's Tailwind config is only needed to run Storybook.
 
-Build CSS with `npm run build:css` in the client package.
+**Color mapping used in components:**
+- Brand: `indigo-500` / `indigo-600`
+- Surfaces: `white` / `gray-100`
+- Text primary: `gray-900`
+- Text secondary: `gray-500`
+- Warning: `amber-500`, Error: `red-500`
 
 ### PlayerAvatar (`src/components/PlayerAvatar.tsx`)
 

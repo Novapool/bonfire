@@ -489,10 +489,7 @@ export class SocketServer<T extends SocialGame<any> = SocialGame<any>> {
   }
 
   /**
-   * Handle game action (stub for Phase 3)
-   *
-   * Individual games extending SocialGame would implement custom action handling.
-   * This is a placeholder for establishing the pattern.
+   * Handle game action — routes to the game's handleAction implementation
    */
   private async handleGameAction(
     socket: TypedSocket,
@@ -518,13 +515,15 @@ export class SocketServer<T extends SocialGame<any> = SocialGame<any>> {
       // Update activity
       await this.roomManager.updateActivity(context.roomId)
 
-      // For Phase 3, this is a stub
-      // Individual games would extend SocketServer or handle actions differently
-      callback?.({
-        success: false,
-        error: 'Game actions not implemented for base SocialGame',
-        code: 'NOT_IMPLEMENTED',
-      })
+      // Delegate to the game's handleAction implementation
+      const action = {
+        playerId: context.playerId,
+        type: actionType,
+        payload: payload ?? {},
+        timestamp: Date.now(),
+      }
+      const result = await room.game.handleAction(action)
+      callback?.(result)
     } catch (error) {
       this.handleError(socket, error, callback)
     }

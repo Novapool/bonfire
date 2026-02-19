@@ -84,29 +84,29 @@ export const Lobby: React.FC<LobbyProps> = ({
 
   return (
     <div
-      className={`max-w-md mx-auto p-6 bg-surface rounded-lg shadow-card ${className}`}
+      className={`max-w-md mx-auto p-6 bg-white rounded-lg shadow-md ${className}`}
       role="region"
       aria-label="Game lobby"
     >
       {/* Room Code Section */}
       <div className="text-center mb-8">
-        <h2 className="text-sm font-medium text-text-secondary mb-2">
+        <h2 className="text-sm font-medium text-gray-500 mb-2">
           Room Code
         </h2>
         <div className="flex items-center justify-center gap-2">
-          <div className="text-4xl font-bold tracking-wider font-mono text-brand-primary">
+          <div className="text-4xl font-bold tracking-wider font-mono text-indigo-500">
             {roomCode || '------'}
           </div>
           {roomCode && (
             <button
               onClick={handleCopyCode}
-              className="p-2 rounded-lg hover:bg-surface-elevated transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="Copy room code"
               title="Copy to clipboard"
             >
               {copied ? (
                 <svg
-                  className="w-6 h-6 text-success"
+                  className="w-6 h-6 text-green-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -120,7 +120,7 @@ export const Lobby: React.FC<LobbyProps> = ({
                 </svg>
               ) : (
                 <svg
-                  className="w-6 h-6 text-text-secondary"
+                  className="w-6 h-6 text-gray-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -140,7 +140,7 @@ export const Lobby: React.FC<LobbyProps> = ({
 
       {/* Player Count */}
       <div className="text-center mb-4">
-        <span className="text-sm text-text-secondary">
+        <span className="text-sm text-gray-500">
           {players.length} / {maxPlayers} players
         </span>
       </div>
@@ -161,8 +161,8 @@ export const Lobby: React.FC<LobbyProps> = ({
               key={player.id}
               className={`flex items-center gap-3 p-3 rounded-lg ${
                 player.id === playerId
-                  ? 'bg-brand-primary bg-opacity-10'
-                  : 'bg-surface-elevated'
+                  ? 'bg-indigo-50'
+                  : 'bg-gray-100'
               }`}
             >
               <PlayerAvatar
@@ -175,14 +175,14 @@ export const Lobby: React.FC<LobbyProps> = ({
                 <div className="font-medium">
                   {player.name}
                   {player.id === playerId && (
-                    <span className="text-sm text-text-secondary ml-2">
+                    <span className="text-sm text-gray-500 ml-2">
                       (You)
                     </span>
                   )}
                 </div>
                 {showReadyStates && (
-                  <div className="text-sm text-text-secondary">
-                    {player.status === 'ready' ? 'Ready' : 'Not ready'}
+                  <div className="text-sm text-gray-500">
+                    {(player.metadata?.status as string) === 'ready' ? 'Ready' : 'Not ready'}
                   </div>
                 )}
               </div>
@@ -204,7 +204,7 @@ export const Lobby: React.FC<LobbyProps> = ({
             disabled={!canStart || isStarting}
             className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-all ${
               canStart && !isStarting
-                ? 'bg-brand-primary hover:bg-brand-secondary cursor-pointer'
+                ? 'bg-indigo-500 hover:bg-indigo-600 cursor-pointer'
                 : 'bg-gray-300 cursor-not-allowed'
             }`}
             aria-label="Start game"
@@ -212,7 +212,7 @@ export const Lobby: React.FC<LobbyProps> = ({
             {isStarting ? 'Starting...' : 'Start Game'}
           </button>
           {!canStart && players.length < minPlayers && (
-            <p className="text-sm text-text-secondary text-center mt-2">
+            <p className="text-sm text-gray-500 text-center mt-2">
               Need at least {minPlayers} players to start
             </p>
           )}
@@ -221,7 +221,7 @@ export const Lobby: React.FC<LobbyProps> = ({
 
       {/* Waiting message for non-hosts */}
       {!hideStartButton && !isHost && (
-        <div className="text-center text-text-secondary">
+        <div className="text-center text-gray-500">
           <p className="text-sm">Waiting for host to start the game...</p>
         </div>
       )}

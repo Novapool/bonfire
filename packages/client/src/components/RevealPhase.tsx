@@ -32,26 +32,26 @@ const defaultRenderItem = (item: RevealItem, index: number, revealed: boolean) =
     className={`
       flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-500
       ${revealed
-        ? 'border-brand-primary/30 bg-brand-primary/5 opacity-100 translate-y-0'
-        : 'border-transparent bg-surface opacity-0 translate-y-2'
+        ? 'border-indigo-200 bg-indigo-50 opacity-100 translate-y-0'
+        : 'border-transparent bg-white opacity-0 translate-y-2'
       }
     `.trim()}
     aria-hidden={!revealed}
   >
     <span
-      className="w-8 h-8 rounded-full bg-brand-primary text-white text-sm font-bold flex items-center justify-center flex-shrink-0"
+      className="w-8 h-8 rounded-full bg-indigo-500 text-white text-sm font-bold flex items-center justify-center flex-shrink-0"
       aria-hidden="true"
     >
       {index + 1}
     </span>
     <div className="flex-1 min-w-0">
-      <p className="font-semibold text-text-primary truncate">{item.label}</p>
+      <p className="font-semibold text-gray-900 truncate">{item.label}</p>
       {item.sublabel && (
-        <p className="text-sm text-text-secondary truncate">{item.sublabel}</p>
+        <p className="text-sm text-gray-500 truncate">{item.sublabel}</p>
       )}
     </div>
     {item.meta && (
-      <span className="text-sm font-semibold text-brand-primary flex-shrink-0">{item.meta}</span>
+      <span className="text-sm font-semibold text-indigo-500 flex-shrink-0">{item.meta}</span>
     )}
   </div>
 );
@@ -97,7 +97,7 @@ export const RevealPhase: React.FC<RevealPhaseProps> = ({
   return (
     <div className={`space-y-3 ${className}`} role="list" aria-label={title || 'Reveal list'}>
       {title && (
-        <h2 className="text-lg font-bold text-text-primary text-center mb-4">{title}</h2>
+        <h2 className="text-lg font-bold text-gray-900 text-center mb-4">{title}</h2>
       )}
       {items.map((item, index) => {
         const revealed = index < revealedCount;

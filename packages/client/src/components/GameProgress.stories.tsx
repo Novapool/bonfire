@@ -65,15 +65,15 @@ export const AllVariants: Story = {
   render: () => (
     <div className="space-y-8 w-72">
       <div>
-        <p className="text-sm font-semibold text-text-secondary mb-2">Bar</p>
+        <p className="text-sm font-semibold text-gray-500 mb-2">Bar</p>
         <GameProgress current={4} total={10} variant="bar" label="Round 4 of 10" />
       </div>
       <div>
-        <p className="text-sm font-semibold text-text-secondary mb-2">Dots</p>
+        <p className="text-sm font-semibold text-gray-500 mb-2">Dots</p>
         <GameProgress current={4} total={10} variant="dots" label="Question 4 of 10" />
       </div>
       <div>
-        <p className="text-sm font-semibold text-text-secondary mb-2">Number</p>
+        <p className="text-sm font-semibold text-gray-500 mb-2">Number</p>
         <GameProgress current={4} total={10} variant="number" label="Round" />
       </div>
     </div>

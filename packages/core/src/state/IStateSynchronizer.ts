@@ -26,6 +26,13 @@ export interface IStateSynchronizer<TState extends GameState> {
     event: K,
     payload: GameEventPayloads[K]
   ): Promise<void>;
+
+  /**
+   * Broadcast a custom game-specific event to all connected players.
+   * Use this for game events that are not part of the framework lifecycle
+   * (e.g. 'question_revealed', 'round_ended', 'score_updated').
+   */
+  broadcastCustomEvent(type: string, payload: unknown): Promise<void>;
 }
 
 /**

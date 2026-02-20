@@ -85,6 +85,15 @@ describe('SocialGame', () => {
       expect(result.success).toBe(false);
       expect(result.error).toContain('full');
     });
+
+    it('should return error when onPlayerJoin throws', async () => {
+      const player = createTestPlayer({ id: 'p1' });
+      vi.spyOn(game, 'onPlayerJoin').mockRejectedValueOnce(new Error('join hook failed'));
+
+      const result = await game.joinPlayer(player);
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('join hook failed');
+    });
   });
 
   describe('leavePlayer', () => {
@@ -127,6 +136,14 @@ describe('SocialGame', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('not found');
+    });
+
+    it('should return error when onPlayerLeave throws', async () => {
+      vi.spyOn(game, 'onPlayerLeave').mockRejectedValueOnce(new Error('leave hook failed'));
+
+      const result = await game.leavePlayer('p1');
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('leave hook failed');
     });
   });
 
@@ -175,6 +192,13 @@ describe('SocialGame', () => {
 
       expect(handler).toHaveBeenCalledWith({ playerId: 'p1', reason: 'timeout' });
     });
+
+    it('should reject disconnecting non-existent player', async () => {
+      const result = await game.disconnectPlayer('p999');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('not found');
+    });
   });
 
   describe('reconnectPlayer', () => {
@@ -215,6 +239,27 @@ describe('SocialGame', () => {
 
       expect(synchronizer.sendToPlayerCalls).toHaveLength(1);
       expect(synchronizer.sendToPlayerCalls[0].playerId).toBe('p1');
+    });
+
+    it('should succeed without calling sendToPlayer when synchronizer is null', async () => {
+      // Create a game without sync, go through the full join/disconnect cycle
+      const gameWithoutSync = new TestGame('room', createTestState(), {}, null);
+      await gameWithoutSync.joinPlayer(createTestPlayer({ id: 'p1' }));
+      await gameWithoutSync.disconnectPlayer('p1');
+
+      const result = await gameWithoutSync.reconnectPlayer('p1');
+      expect(result.success).toBe(true);
+      const player = gameWithoutSync.getPlayer('p1');
+      expect(player?.isConnected).toBe(true);
+
+      await gameWithoutSync.closeRoom();
+    });
+
+    it('should reject reconnecting non-existent player', async () => {
+      const result = await game.reconnectPlayer('p999');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('not found');
     });
   });
 
@@ -269,6 +314,14 @@ describe('SocialGame', () => {
       expect(result.success).toBe(false);
       expect(result.error).toContain('already started');
     });
+
+    it('should return error when onGameStart throws', async () => {
+      vi.spyOn(game, 'onGameStart').mockRejectedValueOnce(new Error('start hook failed'));
+
+      const result = await game.startGame();
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('start hook failed');
+    });
   });
 
   describe('endGame', () => {
@@ -310,6 +363,14 @@ describe('SocialGame', () => {
       expect(result.success).toBe(false);
       expect(result.error).toContain('not started');
     });
+
+    it('should return error when onGameEnd throws', async () => {
+      vi.spyOn(game, 'onGameEnd').mockRejectedValueOnce(new Error('end hook failed'));
+
+      const result = await game.endGame();
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('end hook failed');
+    });
   });
 
   describe('closeRoom', () => {
@@ -334,6 +395,128 @@ describe('SocialGame', () => {
       await game.joinPlayer(player);
 
       expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('should cleanup player manager timers if initialized', async () => {
+      // Ensure player manager is initialized by joining a player and disconnecting
+      await game.joinPlayer(createTestPlayer({ id: 'p1' }));
+      await game.disconnectPlayer('p1');
+
+      // closeRoom should complete without errors even with pending timers
+      const result = await game.closeRoom();
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('transitionPhase', () => {
+    it('should transition to valid next phase', async () => {
+      // Initial phase is 'lobby', next is 'playing'
+      await game.testTransitionPhase('playing');
+
+      expect(game.getState().phase).toBe('playing');
+    });
+
+    it('should call onPhaseChange hook', async () => {
+      await game.testTransitionPhase('playing');
+
+      expect(game.onPhaseChangeCalls).toHaveLength(1);
+      expect(game.onPhaseChangeCalls[0].from).toBe('lobby');
+      expect(game.onPhaseChangeCalls[0].to).toBe('playing');
+      expect(game.onPhaseChangeCalls[0].timestamp).toBeTypeOf('number');
+    });
+
+    it('should emit phase:changed event', async () => {
+      const handler = vi.fn();
+      game.on('phase:changed', handler);
+
+      await game.testTransitionPhase('playing');
+
+      expect(handler).toHaveBeenCalledOnce();
+      expect(handler.mock.calls[0][0]).toMatchObject({
+        from: 'lobby',
+        to: 'playing',
+      });
+    });
+
+    it('should sync state after phase transition', async () => {
+      synchronizer.reset();
+      await game.testTransitionPhase('playing');
+
+      expect(synchronizer.broadcastStateCalls.length).toBeGreaterThan(0);
+      const lastState = synchronizer.broadcastStateCalls[synchronizer.broadcastStateCalls.length - 1];
+      expect(lastState.phase).toBe('playing');
+    });
+
+    it('should broadcast phase:changed event through synchronizer', async () => {
+      synchronizer.reset();
+      await game.testTransitionPhase('playing');
+
+      const eventCalls = synchronizer.broadcastEventCalls;
+      expect(eventCalls.some((call) => call.event === 'phase:changed')).toBe(true);
+    });
+
+    it('should throw ValidationError for transitioning to the same phase', async () => {
+      // Transitioning to 'lobby' (current phase) is invalid
+      await expect(game.testTransitionPhase('lobby')).rejects.toThrow();
+    });
+
+    it('should throw for unknown target phase not in config', async () => {
+      await expect(game.testTransitionPhase('nonexistent')).rejects.toThrow();
+    });
+
+    it('should allow skipping forward to any phase in config', async () => {
+      // The validator allows forward skips — 'lobby' -> 'results' directly is permitted
+      await game.testTransitionPhase('results');
+      expect(game.getState().phase).toBe('results');
+    });
+
+    it('should allow sequential phase progression', async () => {
+      await game.testTransitionPhase('playing');
+      await game.testTransitionPhase('results');
+      expect(game.getState().phase).toBe('results');
+    });
+
+    it('should allow looping back to first phase', async () => {
+      // Advance to last phase: lobby -> playing -> results
+      await game.testTransitionPhase('playing');
+      await game.testTransitionPhase('results');
+
+      // Loop back to first phase (lobby)
+      await game.testTransitionPhase('lobby');
+      expect(game.getState().phase).toBe('lobby');
+    });
+  });
+
+  describe('updateState', () => {
+    it('should merge partial updates into current state', async () => {
+      await game.testUpdateState({ metadata: { round: 1 } });
+
+      expect(game.getState().metadata).toEqual({ round: 1 });
+    });
+
+    it('should preserve existing state fields when updating', async () => {
+      await game.joinPlayer(createTestPlayer({ id: 'p1' }));
+      synchronizer.reset();
+
+      await game.testUpdateState({ metadata: { extraData: 'value' } });
+
+      // Players should still be in state
+      expect(game.getState().players).toHaveLength(1);
+      expect(game.getState().roomId).toBe('test-room');
+    });
+
+    it('should sync state after update', async () => {
+      synchronizer.reset();
+      await game.testUpdateState({ metadata: { round: 2 } });
+
+      expect(synchronizer.broadcastStateCalls.length).toBeGreaterThan(0);
+    });
+
+    it('should allow overwriting existing metadata', async () => {
+      await game.testUpdateState({ metadata: { round: 1 } });
+      await game.testUpdateState({ metadata: { round: 2, score: 100 } });
+
+      expect(game.getState().metadata).toEqual({ round: 2, score: 100 });
     });
   });
 
@@ -371,6 +554,28 @@ describe('SocialGame', () => {
 
       expect(result.success).toBe(true);
       expect(game.getPlayers()).toHaveLength(1);
+    });
+  });
+
+  describe('broadcastEvent', () => {
+    it('should broadcast custom event to synchronizer', async () => {
+      await game.testBroadcastEvent('question_revealed', { question: 'What is love?' });
+
+      expect(synchronizer.broadcastCustomEventCalls).toHaveLength(1);
+      expect(synchronizer.broadcastCustomEventCalls[0]).toEqual({
+        type: 'question_revealed',
+        payload: { question: 'What is love?' },
+      });
+    });
+
+    it('should not throw when synchronizer is null', async () => {
+      const gameWithoutSync = new TestGame('room', createTestState(), {}, null);
+
+      await expect(
+        gameWithoutSync.testBroadcastEvent('round_ended', { round: 1 })
+      ).resolves.not.toThrow();
+
+      await gameWithoutSync.closeRoom();
     });
   });
 

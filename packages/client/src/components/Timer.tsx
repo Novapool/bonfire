@@ -13,6 +13,8 @@ export interface TimerProps {
   size?: 'sm' | 'md' | 'lg';
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
   /** Auto-start timer on mount */
   autoStart?: boolean;
 }
@@ -46,6 +48,7 @@ export const Timer: React.FC<TimerProps> = ({
   variant: initialVariant = 'default',
   size = 'md',
   className = '',
+  style,
   autoStart = true,
 }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -104,6 +107,7 @@ export const Timer: React.FC<TimerProps> = ({
   return (
     <div
       className={`relative inline-flex items-center justify-center ${sizeClasses[size]} ${className}`}
+      style={style}
       role="timer"
       aria-live="polite"
       aria-label={`${displayTime} seconds remaining`}

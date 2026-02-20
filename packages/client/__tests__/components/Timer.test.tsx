@@ -29,15 +29,15 @@ describe('Timer', () => {
 
   it('should apply correct variant colors', () => {
     const { rerender, container } = render(<Timer duration={30} variant="default" autoStart={false} />);
-    let timeDisplay = container.querySelector('.text-brand-primary');
+    let timeDisplay = container.querySelector('.text-indigo-500');
     expect(timeDisplay).toBeInTheDocument();
 
     rerender(<Timer duration={30} variant="warning" autoStart={false} />);
-    timeDisplay = container.querySelector('.text-warning');
+    timeDisplay = container.querySelector('.text-amber-500');
     expect(timeDisplay).toBeInTheDocument();
 
     rerender(<Timer duration={30} variant="danger" autoStart={false} />);
-    timeDisplay = container.querySelector('.text-error');
+    timeDisplay = container.querySelector('.text-red-500');
     expect(timeDisplay).toBeInTheDocument();
   });
 

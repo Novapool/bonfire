@@ -19,6 +19,8 @@ export interface PromptCardProps {
   children?: ReactNode;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
   /** Whether to animate in on mount */
   animate?: boolean;
 }
@@ -67,6 +69,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
   subtitle,
   children,
   className = '',
+  style,
   animate: _animate = false,
 }) => {
   const config = variantConfig[variant];
@@ -78,6 +81,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
         ${config.bg} ${config.border}
         ${className}
       `.trim()}
+      style={style}
       role="article"
       aria-label="Game prompt"
     >

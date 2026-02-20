@@ -45,6 +45,8 @@ export interface ResponseInputProps {
   submitLabel?: string;
   /** Additional CSS classes for the root element */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
 }
 
 // ---- Sub-components ----
@@ -276,6 +278,7 @@ export const ResponseInput: React.FC<ResponseInputProps> = ({
   showSubmit = true,
   submitLabel = 'Submit',
   className = '',
+  style,
 }) => {
   // Normalize controlled value
   const isText = config.type === 'text';
@@ -293,7 +296,7 @@ export const ResponseInput: React.FC<ResponseInputProps> = ({
     : (internalValue as string[]).length > 0;
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-4 ${className}`} style={style}>
       {config.type === 'text' && (
         <TextInput
           config={config}

@@ -233,13 +233,16 @@ Full voting UI component. Supports active voting mode and a results display mode
 
 ```
 Props:
-  options: VoteOption[]                — Array of { id, label, votes? } options
-  onVote?: (optionId: string) => void  — Called when a player selects an option
-  selectedId?: string                  — Currently selected option (controlled)
-  disabled?: boolean                   — Disable all vote buttons (default: false)
-  showResults?: boolean                — Show vote counts and percentages (default: false)
-  totalVotes?: number                  — Total votes cast (used for percentage calculation)
+  options: VoteOption[]                     — Array of { id, label, description?, author? } options
+  onVote?: (optionId: string) => void       — Called when a player selects an option
+  currentVote?: string                      — Currently selected option ID (controlled)
+  disabled?: boolean                        — Disable all vote buttons (default: false)
+  showResults?: boolean                     — Show vote counts and percentages (default: false)
+  voteCounts?: Record<string, number>       — Map of option ID → vote count
+  totalVoters?: number                      — Total voters (used for percentage calculation)
+  title?: string                            — Heading shown above options
   className?: string
+  style?: React.CSSProperties
 ```
 
 ### colorHash Utility (`src/utils/colorHash.ts`)

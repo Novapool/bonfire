@@ -27,7 +27,15 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 ## Recently Completed
 
-1. **Bonfire Bug Fixes from LOIV2** (Feb 19, 2026)
+1. **Framework Blocker Fixes** (Feb 19, 2026)
+   - ✅ `broadcastEvent(type, payload)` added to `SocialGame` — game subclasses can now push custom events (e.g. `question_revealed`, `round_ended`) to clients without unsafe casting. Added `broadcastCustomEvent` to `IStateSynchronizer` + `SocketStateSynchronizer`.
+   - ✅ `playerOrder?: PlayerId[]` added to base `GameState` — turn-based games no longer need to manage this manually in metadata.
+   - ✅ `style?: React.CSSProperties` added to all 8 UI components — inline styles now work alongside `className`.
+   - ✅ 4 pre-existing broken client tests fixed (stale Tailwind class names from token migration).
+   - All tests passing: core 131/131, client 204/204, server non-Firebase 129/129.
+   - New docs: `docs/KNOWN_ISSUES.md` — canonical tracker for active bugs and recently fixed issues.
+
+2. **Bonfire Bug Fixes from LOIV2** (Feb 19, 2026)
    - ✅ `SocketServer.handleGameAction` — was a stub, now properly delegates to `room.game.handleAction(action)` (already fixed)
    - ✅ **UI components Tailwind tokens** — replaced all Bonfire-specific tokens (`bg-surface`, `text-brand-primary`, `text-text-secondary`, etc.) with standard Tailwind equivalents (`bg-white`, `text-indigo-500`, `text-gray-500`, etc.) in all 8 components + stories
    - ✅ **API documentation** — fixed incorrect signatures in README.md, architecture doc, CLAUDE.md:
@@ -38,7 +46,7 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
    - ✅ **Vite CJS interop** — added `optimizeDeps` + `commonjsOptions` config to README
    - ✅ **Build order** — documented that Bonfire packages must be built before game project install
 
-2. **Milestone 6 - LOIV2 Project Scaffolded** (Feb 17, 2026)
+3. **Milestone 6 - LOIV2 Project Scaffolded** (Feb 17, 2026)
    - Created `~/Documents/Programs/LOIV2/` as standalone project
    - Ported question bank (5 levels, ~200 questions) from LOI v1 to TypeScript
    - Wrote complete game design doc: state model, player actions, turn flow
@@ -47,7 +55,7 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
    - Set up package.json with `file:` references to Bonfire packages
    - Created placeholder entry points ready for implementation
 
-2. **Milestone 5 - UI Components Phase 4** (Feb 12, 2026)
+4. **Milestone 5 - UI Components Phase 4** (Feb 12, 2026)
    - Built `<RevealPhase>` - Sequential animated reveal for answers/players, supports custom renderItem, configurable delay, onRevealComplete callback
    - Built `<GameProgress>` - Progress indicator with bar/dots/number variants, all with ARIA progressbar role
    - Built `<VotingInterface>` - Full voting UI with results display, vote counts, percentages, winner highlighting
@@ -56,7 +64,7 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
    - **205 total tests, all passing** (46 new for Phase 4)
    - Updated all documentation (CLAUDE.md, MILESTONES.md, IN-PROGRESS.md, client CLAUDE.md, client README.md)
 
-2. **Milestone 5 - UI Components Phase 3** (Feb 12, 2026)
+5. **Milestone 5 - UI Components Phase 3** (Feb 12, 2026)
    - Built PromptCard with 4 variants (standard/spicy/creative/dare), category badge, round indicator
    - Built ResponseInput: text (single/multiline), multiple-choice (single/multi-select), ranking modes
    - Exported all 5 components + colorHash utility from @bonfire/client index
@@ -74,19 +82,16 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 ## Blockers
 
-**Missing features every game needs (not yet built):**
-- `this.broadcastEvent(type, payload)` on SocialGame — no clean way to push one-time events to clients; `synchronizer.broadcastEvent()` is untyped, undocumented, can be null
-- `playerOrder` in base GameState — every turn-based game needs this; add to GameState or ship a TurnManager utility
-- UI components need `style`/`className` override support for custom visuals (or convert to inline with theme prop)
+_No active blockers. See `docs/KNOWN_ISSUES.md` for the canonical issue tracker._
 
 ---
 
 ## Next Steps
 
 1. **Short-term (Next Sprint — Milestone 6):**
-   - Create new package or app for Intimacy Ladder v2
-   - Design game state structure (phases, question levels, player actions)
-   - Port existing game logic and question database
+   - Implement `IntimacyLadderGame` class in `LOIV2/server/src/game.ts`
+   - Wire up `SocketServer` in `LOIV2/server/src/index.ts`
+   - Build React screens in `LOIV2/client/src/screens/`
 
 2. **Medium-term (Milestone 7+):**
    - Framework refinement based on Intimacy Ladder experience
@@ -118,16 +123,17 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 **Documentation Status:**
 - Root CLAUDE.md ✅ (updated Feb 12, 2026 - Milestone 5 complete)
-- docs/PROJECT_OVERVIEW.md ✅
-- docs/MILESTONES.md ✅ (updated Feb 12, 2026 - Milestone 5 complete, 5/13 done)
-- docs/architecture/core-classes.md ✅
+- docs/PROJECT_OVERVIEW.md ✅ (updated Feb 19, 2026)
+- docs/MILESTONES.md ✅ (updated Feb 19, 2026)
+- docs/architecture/core-classes.md ✅ (updated Feb 19, 2026)
 - docs/architecture/server-infrastructure.md ✅
-- docs/architecture/client-library.md ✅
+- docs/architecture/client-library.md ✅ (updated Feb 19, 2026)
 - docs/api/FIREBASE.md ✅
 - docs/api/ADMIN_API.md ✅
-- IN-PROGRESS.md ✅ (updated Feb 12, 2026)
+- docs/KNOWN_ISSUES.md ✅ (created Feb 19, 2026)
+- IN-PROGRESS.md ✅ (updated Feb 19, 2026)
 - packages/core/README.md ✅
 - packages/server/README.md ✅
-- packages/server/CLAUDE.md ✅
-- packages/client/README.md ✅
+- packages/server/CLAUDE.md ✅ (updated Feb 19, 2026)
+- packages/client/README.md ✅ (updated Feb 19, 2026)
 - packages/client/CLAUDE.md ✅

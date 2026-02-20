@@ -13,6 +13,8 @@ export interface GameProgressProps {
   label?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
 }
 
 const BarProgress: React.FC<{ current: number; total: number }> = ({ current, total }) => {
@@ -87,8 +89,9 @@ export const GameProgress: React.FC<GameProgressProps> = ({
   variant = 'bar',
   label,
   className = '',
+  style,
 }) => (
-  <div className={`space-y-1.5 ${className}`}>
+  <div className={`space-y-1.5 ${className}`} style={style}>
     {variant === 'bar' && <BarProgress current={current} total={total} />}
     {variant === 'dots' && <DotsProgress current={current} total={total} />}
     {variant === 'number' && <NumberProgress current={current} total={total} />}

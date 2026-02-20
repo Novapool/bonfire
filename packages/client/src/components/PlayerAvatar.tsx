@@ -16,6 +16,8 @@ export interface PlayerAvatarProps {
   isHost?: boolean;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element (merged with internal backgroundColor) */
+  style?: React.CSSProperties;
 }
 
 const sizeClasses = {
@@ -54,6 +56,7 @@ export const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
   isOnline = false,
   isHost = false,
   className = '',
+  style,
 }) => {
   const initials = getPlayerInitials(name);
   const backgroundColor = color || getPlayerColor(name);
@@ -61,7 +64,7 @@ export const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
   return (
     <div
       className={`relative inline-flex items-center justify-center rounded-full font-semibold text-white select-none ${sizeClasses[size]} ${className}`}
-      style={{ backgroundColor }}
+      style={{ backgroundColor, ...style }}
       title={name}
       role="img"
       aria-label={`${name}${isHost ? ' (host)' : ''}${showStatus ? ` (${isOnline ? 'online' : 'offline'})` : ''}`}

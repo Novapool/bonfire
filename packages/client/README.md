@@ -100,7 +100,7 @@ function GameUI() {
     <div>
       <h1>Room: {state.roomId}</h1>
       <p>Phase: {state.phase}</p>
-      <p>Players: {state.playerOrder.length}</p>
+      <p>Players: {state.playerOrder?.length ?? 0}</p>
 
       {isHost && state.phase === 'lobby' && (
         <button onClick={() => startGame()}>Start Game</button>

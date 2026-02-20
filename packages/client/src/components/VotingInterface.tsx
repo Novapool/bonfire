@@ -28,6 +28,8 @@ export interface VotingInterfaceProps {
   title?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
 }
 
 interface VoteBarProps {
@@ -67,6 +69,7 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
   totalVoters = 0,
   title,
   className = '',
+  style,
 }) => {
   const maxVotes = showResults
     ? Math.max(0, ...options.map((o) => voteCounts[o.id] ?? 0))
@@ -75,6 +78,7 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
   return (
     <div
       className={`space-y-3 ${className}`}
+      style={style}
       role="radiogroup"
       aria-label={title || 'Vote options'}
     >

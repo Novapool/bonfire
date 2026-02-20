@@ -84,10 +84,13 @@ export default class MyGame extends SocialGame {
 
 **UI Component Library:**
 - `<Lobby>` - Room codes, player lists, ready states
+- `<PlayerAvatar>` - Deterministic color avatars with status and host crown
+- `<Timer>` - Countdown with visual feedback
 - `<PromptCard>` - Themed question displays
 - `<ResponseInput>` - Text, multiple choice, ranking
 - `<RevealPhase>` - Animated answer reveals
-- `<Timer>` - Countdown with visual feedback
+- `<GameProgress>` - Progress bar/dots/number variants
+- `<VotingInterface>` - Voting UI with results and percentages
 
 ### For End Users (Players)
 

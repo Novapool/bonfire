@@ -53,6 +53,10 @@ Game (abstract base)
    - Optional `IStateSynchronizer` for backend integration
    - Immutable state updates via StateManager
    - Automatic state broadcasting
+   - `protected transitionPhase(phase)` - Change game phase and broadcast state
+   - `protected updateState(updater)` - Update game-specific state fields
+   - `protected broadcastEvent(type, payload)` - Push custom game events to all clients (e.g. `question_revealed`, `round_ended`)
+   - Base `GameState` includes `playerOrder?: PlayerId[]` for turn-based games
 
 **Extension Pattern:**
 
@@ -196,10 +200,11 @@ class MyGame extends SocialGame<MyGameState> {
 
 **Interface:**
 ```typescript
-interface IStateSynchronizer<TState> {
+interface IStateSynchronizer<TState extends GameState> {
   broadcastState(state: TState): Promise<void>;
   sendToPlayer(playerId: string, state: TState): Promise<void>;
-  broadcastEvent(event: string, payload: unknown): Promise<void>;
+  broadcastEvent<K extends GameEventType>(event: K, payload: GameEventPayloads[K]): Promise<void>;
+  broadcastCustomEvent(type: string, payload: unknown): Promise<void>;
 }
 ```
 
@@ -244,10 +249,11 @@ const game = new MyGame('room-123', initialState, mySynchronizer);
 - `EventEmitter.test.ts` - 10 tests for event system
 - `validators.test.ts` - 18 tests for validation logic
 - `PlayerManager.test.ts` - 14 tests with fake timers for disconnect handling
-- `SocialGame.test.ts` - 35 tests for complete API
+- `StateManager.test.ts` - 24 tests for updateState, cloneState, validateStateUpdate
+- `SocialGame.test.ts` - 57 tests for complete API (incl. transitionPhase, updateState, error paths)
 - `integration.test.ts` - 6 tests for full game lifecycle scenarios
 
-**Total:** 83 tests, 83.16% coverage
+**Total:** 131 tests, ~92% statement coverage, ~93% function coverage
 
 **Key Test Scenarios:**
 - Player join/leave/disconnect/reconnect flows

@@ -384,6 +384,17 @@ export abstract class SocialGame<TState extends GameState = GameState> extends G
   }
 
   /**
+   * Broadcast a custom game-specific event to all connected clients.
+   * Use this for game events that are not part of the framework lifecycle
+   * (e.g. 'question_revealed', 'round_ended', 'score_updated').
+   */
+  protected async broadcastEvent(type: string, payload: unknown): Promise<void> {
+    if (this.synchronizer) {
+      await this.synchronizer.broadcastCustomEvent(type, payload);
+    }
+  }
+
+  /**
    * Update state immutably
    */
   protected async updateState(updates: Partial<TState>): Promise<void> {

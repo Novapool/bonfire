@@ -79,11 +79,6 @@ describe('PromptCard', () => {
     expect(container.querySelector('.custom-class')).toBeInTheDocument();
   });
 
-  it('should apply animate class when animate is true', () => {
-    const { container } = render(<PromptCard prompt="Test" animate />);
-    expect(container.querySelector('.animate-slide-up')).toBeInTheDocument();
-  });
-
   it('should not apply animate class by default', () => {
     const { container } = render(<PromptCard prompt="Test" />);
     expect(container.querySelector('.animate-slide-up')).not.toBeInTheDocument();

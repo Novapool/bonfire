@@ -25,6 +25,8 @@ export interface RevealPhaseProps {
   title?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
 }
 
 const defaultRenderItem = (item: RevealItem, index: number, revealed: boolean) => (
@@ -68,6 +70,7 @@ export const RevealPhase: React.FC<RevealPhaseProps> = ({
   renderItem,
   title,
   className = '',
+  style,
 }) => {
   const [revealedCount, setRevealedCount] = useState(revealAll ? items.length : 0);
 
@@ -95,7 +98,7 @@ export const RevealPhase: React.FC<RevealPhaseProps> = ({
   }, [revealAll, revealedCount, items.length, revealDelay, reveal]);
 
   return (
-    <div className={`space-y-3 ${className}`} role="list" aria-label={title || 'Reveal list'}>
+    <div className={`space-y-3 ${className}`} style={style} role="list" aria-label={title || 'Reveal list'}>
       {title && (
         <h2 className="text-lg font-bold text-gray-900 text-center mb-4">{title}</h2>
       )}

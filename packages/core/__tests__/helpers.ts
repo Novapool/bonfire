@@ -11,6 +11,7 @@ import type {
   PlayerAction,
   ActionResult,
   PhaseTransition,
+  Phase,
 } from '../src/types';
 import type { IStateSynchronizer } from '../src/state/IStateSynchronizer';
 
@@ -23,6 +24,7 @@ export class MockStateSynchronizer<TState extends GameState>
   public broadcastStateCalls: TState[] = [];
   public sendToPlayerCalls: Array<{ playerId: PlayerId; state: TState }> = [];
   public broadcastEventCalls: Array<{ event: string; payload: unknown }> = [];
+  public broadcastCustomEventCalls: Array<{ type: string; payload: unknown }> = [];
 
   async broadcastState(state: TState): Promise<void> {
     this.broadcastStateCalls.push(state);
@@ -36,10 +38,15 @@ export class MockStateSynchronizer<TState extends GameState>
     this.broadcastEventCalls.push({ event, payload });
   }
 
+  async broadcastCustomEvent(type: string, payload: unknown): Promise<void> {
+    this.broadcastCustomEventCalls.push({ type, payload });
+  }
+
   reset(): void {
     this.broadcastStateCalls = [];
     this.sendToPlayerCalls = [];
     this.broadcastEventCalls = [];
+    this.broadcastCustomEventCalls = [];
   }
 }
 
@@ -130,6 +137,21 @@ export class TestGame extends SocialGame<GameState> {
 
   async handleAction<T = unknown>(action: PlayerAction<T>): Promise<ActionResult> {
     return { success: true };
+  }
+
+  // Expose protected broadcastEvent for testing
+  async testBroadcastEvent(type: string, payload: unknown): Promise<void> {
+    return this.broadcastEvent(type, payload);
+  }
+
+  // Expose protected transitionPhase for testing
+  async testTransitionPhase(nextPhase: Phase): Promise<void> {
+    return this.transitionPhase(nextPhase);
+  }
+
+  // Expose protected updateState for testing
+  async testUpdateState(updates: Partial<GameState>): Promise<void> {
+    return this.updateState(updates);
   }
 }
 

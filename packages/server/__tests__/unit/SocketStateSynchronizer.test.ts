@@ -175,6 +175,29 @@ describe('SocketStateSynchronizer', () => {
     })
   })
 
+  describe('broadcastCustomEvent', () => {
+    it('should broadcast custom event with event:emit', async () => {
+      await synchronizer.broadcastCustomEvent('question_revealed', { text: 'What is love?' })
+
+      expect(mockIo.toMock).toHaveBeenCalledWith(roomId)
+      const roomEmitter = mockIo.to(roomId)
+      expect(roomEmitter.emitMock).toHaveBeenCalledWith('event:emit', {
+        type: 'question_revealed',
+        payload: { text: 'What is love?' },
+      })
+    })
+
+    it('should broadcast any arbitrary event type', async () => {
+      await synchronizer.broadcastCustomEvent('round_ended', { round: 3, scores: { p1: 10 } })
+
+      const roomEmitter = mockIo.to(roomId)
+      expect(roomEmitter.emitMock).toHaveBeenCalledWith('event:emit', {
+        type: 'round_ended',
+        payload: { round: 3, scores: { p1: 10 } },
+      })
+    })
+  })
+
   describe('integration scenarios', () => {
     it('should handle multiple players with different sockets', async () => {
       synchronizer.registerPlayer('player1', 'socket1')

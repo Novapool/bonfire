@@ -88,6 +88,16 @@ export class SocketStateSynchronizer<TState extends GameState>
   }
 
   /**
+   * Broadcast a custom game-specific event to all players in the room
+   */
+  async broadcastCustomEvent(type: string, payload: unknown): Promise<void> {
+    this.io.to(this.roomId).emit('event:emit', {
+      type,
+      payload,
+    })
+  }
+
+  /**
    * Get all registered player IDs
    */
   getRegisteredPlayers(): PlayerId[] {

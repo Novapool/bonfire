@@ -133,8 +133,8 @@ describe('Lobby', () => {
     const stateWithReady: GameState = {
       ...mockState,
       players: [
-        { id: 'player1', name: 'Alice', isHost: true, isConnected: true, joinedAt: 1000, status: 'ready' },
-        { id: 'player2', name: 'Bob', isHost: false, isConnected: true, joinedAt: 2000, status: 'active' },
+        { id: 'player1', name: 'Alice', isHost: true, isConnected: true, joinedAt: 1000, metadata: { status: 'ready' } },
+        { id: 'player2', name: 'Bob', isHost: false, isConnected: true, joinedAt: 2000, metadata: { status: 'active' } },
       ],
     };
 
@@ -193,7 +193,7 @@ describe('Lobby', () => {
 
     // Should show checkmark icon (svg with path for checkmark)
     await waitFor(() => {
-      const svg = copyButton.querySelector('svg.text-success');
+      const svg = copyButton.querySelector('svg.text-green-500');
       expect(svg).toBeInTheDocument();
     });
   });

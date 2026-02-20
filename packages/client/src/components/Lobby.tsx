@@ -16,6 +16,8 @@ export interface LobbyProps {
   onStart?: () => void | Promise<void>;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles for the root element */
+  style?: React.CSSProperties;
   /** Hide the start button */
   hideStartButton?: boolean;
 }
@@ -31,6 +33,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   onStart,
   hideStartButton = false,
   className = '',
+  style,
 }) => {
   const { state } = useGameState();
   const { isHost, playerId } = usePlayer();
@@ -85,6 +88,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   return (
     <div
       className={`max-w-md mx-auto p-6 bg-white rounded-lg shadow-md ${className}`}
+      style={style}
       role="region"
       aria-label="Game lobby"
     >

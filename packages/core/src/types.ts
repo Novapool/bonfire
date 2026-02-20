@@ -33,6 +33,7 @@ export interface GameState {
   roomId: RoomId;
   phase: Phase;
   players: Player[];
+  playerOrder?: PlayerId[];
   startedAt?: number;
   endedAt?: number;
   metadata?: Record<string, unknown>;

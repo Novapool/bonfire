@@ -1,0 +1,126 @@
+# Bonfire
+
+An open-source TypeScript framework for building social party games — think "Rails for party games."
+
+Bonfire handles the infrastructure so you can focus on game logic: WebSocket rooms, player state, reconnects, phase transitions, and a ready-made React component library are all included out of the box.
+
+## What's in the box
+
+**`@bonfire/core`** — Base classes, types, and interfaces. Extend `SocialGame` and implement your game logic.
+
+**`@bonfire/server`** — Socket.io server, room management, and database adapters (Firebase + in-memory for testing).
+
+**`@bonfire/client`** — React hooks and a UI component library (Lobby, Timer, PlayerAvatar, PromptCard, ResponseInput, VotingInterface, RevealPhase, GameProgress).
+
+## Quick look
+
+```typescript
+import { SocialGame, GameState, Player, PlayerAction, ActionResult } from '@bonfire/core';
+
+interface TriviaState extends GameState {
+  scores: Record<string, number>;
+  currentQuestion: string;
+}
+
+class TriviaGame extends SocialGame<TriviaState> {
+  config = {
+    minPlayers: 2,
+    maxPlayers: 8,
+    phases: ['lobby', 'question', 'results'],
+    disconnectTimeout: 30000,
+  };
+
+  async onGameStart(): Promise<void> {
+    await this.transitionPhase('question');
+  }
+
+  async handleAction(action: PlayerAction): Promise<ActionResult> {
+    // handle player answers
+    return { success: true };
+  }
+}
+```
+
+On the client:
+
+```tsx
+import { BonfireProvider, useGameState, usePlayer, Lobby } from '@bonfire/client';
+
+function App() {
+  return (
+    <BonfireProvider config={{ serverUrl: 'http://localhost:3001' }}>
+      <Game />
+    </BonfireProvider>
+  );
+}
+
+function Game() {
+  const { state } = useGameState();
+  const { player } = usePlayer();
+  // render based on state.phase
+}
+```
+
+## Setup
+
+```bash
+# Clone and install
+git clone <repo-url>
+cd bonfire
+npm install
+
+# Build all packages
+npm run build --workspaces
+
+# Run tests
+npm test --workspaces
+```
+
+The monorepo uses npm workspaces. Build order matters: `core` → `server` / `client`.
+
+## Using Bonfire in a game project
+
+Reference packages via local `file:` paths while in development:
+
+```json
+{
+  "dependencies": {
+    "@bonfire/core": "file:../bonfire/packages/core",
+    "@bonfire/server": "file:../bonfire/packages/server",
+    "@bonfire/client": "file:../bonfire/packages/client"
+  }
+}
+```
+
+If using Vite, add CJS interop config:
+
+```ts
+// vite.config.ts
+export default {
+  optimizeDeps: {
+    include: ['@bonfire/core', '@bonfire/server', '@bonfire/client'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/@bonfire/],
+    },
+  },
+};
+```
+
+**Always rebuild Bonfire packages before running `npm install` in your game project.**
+
+## Documentation
+
+- `docs/PROJECT_OVERVIEW.md` — Architecture, philosophy, tech stack
+- `docs/MILESTONES.md` — Development roadmap and progress
+- `docs/architecture/` — Deep dives into core, server, and client internals
+- `docs/api/FIREBASE.md` — Firebase setup (local emulator + production)
+- `docs/api/ADMIN_API.md` — Admin REST endpoints
+- `packages/core/README.md` — Core API reference
+- `packages/server/README.md` — Server API reference
+- `packages/client/README.md` — Client hooks and components reference
+
+## Status
+
+Milestones 1–5 are complete (core engine, server infrastructure, client library, UI components). Milestone 6 is actively in progress: building the first real game on top of the framework to validate the abstractions.

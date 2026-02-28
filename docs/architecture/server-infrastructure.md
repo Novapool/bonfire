@@ -357,6 +357,7 @@ interface ClientToServerEvents {
   'room:create': (gameType: string, hostName: string, callback: (response: RoomCreateResponse) => void) => void
   'room:join': (roomId: RoomId, playerName: string, callback: (response: RoomJoinResponse) => void) => void
   'room:leave': (callback?: (response: BaseResponse) => void) => void
+  'room:reconnect': (roomId: RoomId, playerId: PlayerId, callback: (response: RoomReconnectResponse) => void) => void
   'game:start': (callback?: (response: BaseResponse) => void) => void
   'game:action': (actionType: string, payload: unknown, callback?: (response: ActionResponse) => void) => void
   'state:request': (callback: (response: StateResponse) => void) => void

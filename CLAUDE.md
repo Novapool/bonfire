@@ -60,3 +60,13 @@ bonfire/
 - **Frontend:** React
 - **Backend (MVP):** Firebase Realtime Database
 - **Backend (Production):** Railway + PostgreSQL + Redis
+
+## Games Built on Bonfire
+
+- **Intimacy Ladder V2** (`~/Documents/Programs/LOIV2/`) — first game, primary beta tester
+  - Integration notes and workarounds: `LOIV2/docs/TO-REMEMBER.md`
+  - Issues for Bonfire to fix: `docs/KNOWN_ISSUES.md` (game projects write here directly)
+
+## Cross-Project Reference
+
+- `~/.claude/BONFIRE_ECOSYSTEM.md` — issue flow, full doc map, cross-project rules

@@ -48,6 +48,14 @@ export interface ActionResponse extends BaseResponse {
 }
 
 /**
+ * Room reconnect response
+ */
+export interface RoomReconnectResponse extends BaseResponse {
+  state?: GameState;
+  playerId?: PlayerId;
+}
+
+/**
  * Error response
  */
 export interface ErrorResponse {

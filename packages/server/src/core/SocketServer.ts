@@ -20,6 +20,7 @@ import type {
   ServerStats,
   ClientToServerEvents,
   ServerToClientEvents,
+  RoomReconnectResponse,
 } from '../types'
 import type { IDatabaseAdapter } from '../database/IDatabaseAdapter'
 import type { SocialGame, PlayerId, RoomId } from '@bonfire/core'
@@ -255,6 +256,10 @@ export class SocketServer<T extends SocialGame<any> = SocialGame<any>> {
 
     socket.on('state:request', (callback) => {
       this.handleStateRequest(socket, callback)
+    })
+
+    socket.on('room:reconnect', (roomId, playerId, callback) => {
+      this.handleRoomReconnect(socket, roomId, playerId, callback)
     })
   }
 
@@ -565,6 +570,58 @@ export class SocketServer<T extends SocialGame<any> = SocialGame<any>> {
   }
 
   /**
+   * Handle room reconnect (page refresh recovery)
+   */
+  private async handleRoomReconnect(
+    socket: TypedSocket,
+    roomId: RoomId,
+    playerId: PlayerId,
+    callback: (response: RoomReconnectResponse) => void
+  ): Promise<void> {
+    try {
+      if (!roomId || typeof roomId !== 'string') {
+        callback({ success: false, error: 'Invalid room ID', code: 'INVALID_INPUT' })
+        return
+      }
+      if (!playerId || typeof playerId !== 'string') {
+        callback({ success: false, error: 'Invalid player ID', code: 'INVALID_INPUT' })
+        return
+      }
+
+      if (!this.roomManager.hasRoom(roomId)) {
+        callback({ success: false, error: 'Room not found', code: 'ROOM_NOT_FOUND' })
+        return
+      }
+
+      const room = this.roomManager.getRoom(roomId)
+      const player = room.game.getPlayer(playerId)
+      if (!player) {
+        callback({ success: false, error: 'Session expired', code: 'SESSION_EXPIRED' })
+        return
+      }
+
+      // Re-register socket mapping and re-join the Socket.io room
+      room.synchronizer.registerPlayer(playerId, socket.id)
+      this.roomManager.trackPlayer(playerId, roomId)
+
+      const context = this.socketContexts.get(socket.id)!
+      context.playerId = playerId
+      context.roomId = roomId
+
+      socket.join(roomId)
+
+      // Mark player as reconnected (cancels timeout timer, sets isConnected = true)
+      await room.game.reconnectPlayer(playerId)
+
+      await this.roomManager.updateActivity(roomId)
+
+      callback({ success: true, state: room.game.getState(), playerId })
+    } catch (error) {
+      this.handleError(socket, error, callback)
+    }
+  }
+
+  /**
    * Handle disconnect
    */
   private async handleDisconnect(socket: TypedSocket): Promise<void> {
@@ -577,7 +634,17 @@ export class SocketServer<T extends SocialGame<any> = SocialGame<any>> {
 
       const room = this.roomManager.getRoom(context.roomId)
 
-      // Call disconnectPlayer (PlayerManager handles timeout)
+      // Check for close-on-host-leave strategy
+      const strategy = room.game.config.disconnectStrategy ?? 'reconnect-window'
+      const disconnectingPlayer = room.game.getPlayer(context.playerId)
+      if (disconnectingPlayer?.isHost && strategy === 'close-on-host-leave') {
+        this.io.to(context.roomId).emit('room:closed', 'Host disconnected')
+        await this.roomManager.deleteRoom(context.roomId)
+        this.socketContexts.delete(socket.id)
+        return
+      }
+
+      // Call disconnectPlayer (PlayerManager handles timeout; strategy applied inside)
       await room.game.disconnectPlayer(context.playerId)
 
       // Unregister from synchronizer

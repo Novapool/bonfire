@@ -1,6 +1,6 @@
 # IN-PROGRESS - Bonfire
 
-**Last Updated:** February 19, 2026 (LOIV2 bug fixes applied to Bonfire)
+**Last Updated:** February 27, 2026 (Disconnect strategies + reconnect + DX hooks)
 
 ---
 
@@ -27,7 +27,19 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 ## Recently Completed
 
-1. **Framework Blocker Fixes** (Feb 19, 2026)
+1. **Disconnect Strategies + Reconnect System + DX Hooks** (Feb 27, 2026)
+   - ✅ `DisconnectStrategy` type added to `GameConfig` (`reconnect-window` | `close-on-host-leave` | `transfer-host` | `skip-turn`)
+   - ✅ `currentTurnIndex?: number` added to `GameState` (needed for `skip-turn` + `useTurn`)
+   - ✅ `transferHost()` + `handleSkipTurn()` added to `SocialGame`, wired into `disconnectPlayer()`
+   - ✅ `SocketServer.handleDisconnect` — closes room immediately if host leaves and strategy is `close-on-host-leave`
+   - ✅ `room:reconnect` event — server-side `handleRoomReconnect`, `RoomReconnectResponse` contract type
+   - ✅ `BonfireClient.reconnectToRoom()` + `loadSession()` — sessionStorage auto-save/clear on join/leave/close
+   - ✅ `useRoom()` exposes `reconnectToRoom(roomId, playerId)`
+   - ✅ `useTurn()` hook — `isMyTurn`, `currentPlayerId`, `currentPlayer`, `turnIndex`
+   - ✅ `useGameState<TState>()` — typed generic eliminates cast at every call site
+   - All tests still passing (core 131, server, client)
+
+2. **Framework Blocker Fixes** (Feb 19, 2026)
    - ✅ `broadcastEvent(type, payload)` added to `SocialGame` — game subclasses can now push custom events (e.g. `question_revealed`, `round_ended`) to clients without unsafe casting. Added `broadcastCustomEvent` to `IStateSynchronizer` + `SocketStateSynchronizer`.
    - ✅ `playerOrder?: PlayerId[]` added to base `GameState` — turn-based games no longer need to manage this manually in metadata.
    - ✅ `style?: React.CSSProperties` added to all 8 UI components — inline styles now work alongside `className`.

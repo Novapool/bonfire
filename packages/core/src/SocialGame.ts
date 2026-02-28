@@ -182,6 +182,15 @@ export abstract class SocialGame<TState extends GameState = GameState> extends G
     }
 
     try {
+      const strategy = this.config.disconnectStrategy ?? 'reconnect-window';
+
+      // Apply strategy-specific behavior before marking disconnected
+      if (strategy === 'transfer-host') {
+        this.transferHost(playerId);
+      } else if (strategy === 'skip-turn') {
+        this.handleSkipTurn(playerId);
+      }
+
       // Mark as disconnected with timeout
       this.playerManager.disconnect(playerId, (id) => this.handlePlayerTimeout(id));
 
@@ -203,6 +212,52 @@ export abstract class SocialGame<TState extends GameState = GameState> extends G
         success: false,
         error: error instanceof Error ? error.message : 'Failed to disconnect player',
       };
+    }
+  }
+
+  /**
+   * Transfer host role to the next available player when the host disconnects.
+   * Called before playerManager.disconnect() so the new host is still considered connected.
+   */
+  protected transferHost(disconnectedPlayerId: PlayerId): void {
+    const disconnectingPlayer = this.state.players.find((p) => p.id === disconnectedPlayerId);
+    if (!disconnectingPlayer?.isHost) {
+      return; // Not the host — nothing to transfer
+    }
+
+    const nextHost = this.state.players.find(
+      (p) => p.id !== disconnectedPlayerId && p.isConnected
+    );
+    if (!nextHost) {
+      return; // No connected player to promote
+    }
+
+    disconnectingPlayer.isHost = false;
+    nextHost.isHost = true;
+  }
+
+  /**
+   * Advance currentTurnIndex to the next connected player when the current turn player disconnects.
+   */
+  private handleSkipTurn(disconnectedPlayerId: PlayerId): void {
+    const { playerOrder, currentTurnIndex } = this.state;
+    if (
+      playerOrder == null ||
+      currentTurnIndex == null ||
+      playerOrder[currentTurnIndex] !== disconnectedPlayerId
+    ) {
+      return; // Not their turn — nothing to skip
+    }
+
+    const total = playerOrder.length;
+    for (let i = 1; i < total; i++) {
+      const nextIndex = (currentTurnIndex + i) % total;
+      const nextPlayerId = playerOrder[nextIndex];
+      const nextPlayer = this.state.players.find((p) => p.id === nextPlayerId);
+      if (nextPlayer?.isConnected && nextPlayer.id !== disconnectedPlayerId) {
+        this.state.currentTurnIndex = nextIndex;
+        return;
+      }
     }
   }
 

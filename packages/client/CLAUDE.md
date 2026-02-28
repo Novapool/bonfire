@@ -11,7 +11,7 @@ React hooks and utilities for building Bonfire party game UIs.
 This package provides the client-side React integration for Bonfire games:
 - **BonfireClient** - Socket.io wrapper with Promise-based API and subscription model
 - **BonfireProvider** - React context provider for client access
-- **6 React hooks** - Type-safe hooks for game state, connection, room management, player data, phase tracking, and events
+- **7 React hooks** - Type-safe hooks for game state, connection, room management, player data, phase tracking, events, and turn management
 - **BonfireErrorBoundary** - Error boundary component for graceful error handling
 - **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
 - **colorHash utility** - Deterministic player color generation from names
@@ -37,7 +37,8 @@ src/
 │   ├── useRoom.ts                    - Room management and actions
 │   ├── usePlayer.ts                  - Player data and derived state
 │   ├── usePhase.ts                   - Current phase tracking
-│   └── useBonfireEvent.ts            - Custom event subscription
+│   ├── useBonfireEvent.ts            - Custom event subscription
+│   └── useTurn.ts                    - Turn-based game helper (isMyTurn, currentPlayer)
 ├── components/
 │   ├── BonfireErrorBoundary.tsx      - Error boundary component
 │   ├── Lobby.tsx                     - Pre-built lobby screen (room code, players, start)
@@ -147,8 +148,8 @@ __tests__/
 
 **Basic setup:**
 ```tsx
-// 1. Wrap app with provider — use config prop, not serverUrl
-<BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
+// 1. Wrap app with provider — use config.url, not serverUrl
+<BonfireProvider config={{ url: 'http://localhost:3000' }}>
   <App />
 </BonfireProvider>
 

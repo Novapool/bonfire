@@ -7,20 +7,21 @@ import type { GameState } from '@bonfire/core';
  *
  * Uses `useSyncExternalStore` for tear-free reads in concurrent mode.
  *
+ * Accepts an optional `TState` generic to avoid casting at every call site:
+ *
  * @example
  * const { state } = useGameState();
  * if (state) console.log(state.phase);
  *
- * // For custom state fields, use type assertion:
+ * // With typed game state — no cast needed:
  * interface MyGameState extends GameState {
  *   score: Record<string, number>;
  * }
- * const { state } = useGameState();
- * const myState = state as MyGameState;
- * if (myState) console.log(myState.score);
+ * const { state } = useGameState<MyGameState>();
+ * if (state) console.log(state.score);
  */
-export function useGameState(): {
-  state: GameState | null;
+export function useGameState<TState extends GameState = GameState>(): {
+  state: TState | null;
   requestState: () => Promise<void>;
 } {
   const { client } = useBonfireContext();
@@ -30,7 +31,7 @@ export function useGameState(): {
     [client]
   );
 
-  const getSnapshot = useCallback(() => client.gameState, [client]);
+  const getSnapshot = useCallback(() => client.gameState as TState | null, [client]);
 
   const state = useSyncExternalStore(subscribe, getSnapshot);
 

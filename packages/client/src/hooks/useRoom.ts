@@ -1,15 +1,19 @@
 import { useCallback } from 'react';
 import { useBonfireContext } from '../context/BonfireProvider';
 import { useGameState } from './useGameState';
-import type { RoomId } from '@bonfire/core';
-import type { RoomCreateResponse, RoomJoinResponse, BaseResponse, ActionResponse } from '../types';
+import type { RoomId, PlayerId } from '@bonfire/core';
+import type { RoomCreateResponse, RoomJoinResponse, RoomReconnectResponse, BaseResponse, ActionResponse } from '../types';
 
 /**
- * Room and game operations: create, join, leave, start, and send actions.
+ * Room and game operations: create, join, leave, start, send actions, and reconnect.
  *
  * @example
- * const { roomId, isInRoom, createRoom, joinRoom, startGame, sendAction } = useRoom();
+ * const { roomId, isInRoom, createRoom, joinRoom, startGame, sendAction, reconnectToRoom } = useRoom();
  * await createRoom('my-game', 'Alice');
+ *
+ * // Reconnect after page refresh:
+ * const session = client.loadSession();
+ * if (session) await reconnectToRoom(session.roomId, session.playerId);
  */
 export function useRoom(): {
   roomId: RoomId | null;
@@ -19,6 +23,7 @@ export function useRoom(): {
   leaveRoom: () => Promise<BaseResponse>;
   startGame: () => Promise<BaseResponse>;
   sendAction: (actionType: string, payload: unknown) => Promise<ActionResponse>;
+  reconnectToRoom: (roomId: RoomId, playerId: PlayerId) => Promise<RoomReconnectResponse>;
 } {
   const { client } = useBonfireContext();
   // Subscribe to state so roomId re-renders when it changes
@@ -46,5 +51,10 @@ export function useRoom(): {
     [client]
   );
 
-  return { roomId, isInRoom, createRoom, joinRoom, leaveRoom, startGame, sendAction };
+  const reconnectToRoom = useCallback(
+    (roomId: RoomId, playerId: PlayerId) => client.reconnectToRoom(roomId, playerId),
+    [client]
+  );
+
+  return { roomId, isInRoom, createRoom, joinRoom, leaveRoom, startGame, sendAction, reconnectToRoom };
 }

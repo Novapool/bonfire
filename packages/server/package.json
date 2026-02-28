@@ -12,7 +12,7 @@
     "firebase:emulator": "firebase emulators:start --only database",
     "firebase:emulator:ui": "firebase emulators:start --only database",
     "firebase:test": "npx tsx test-firebase.ts",
-    "test:firebase": "firebase emulators:exec --only database 'vitest __tests__/unit/database/FirebaseAdapter.test.ts'"
+    "test:firebase": "firebase emulators:exec --only database 'vitest run __tests__/unit/database/FirebaseAdapter.test.ts'"
   },
   "keywords": [
     "party-games",

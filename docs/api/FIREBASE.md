@@ -103,17 +103,32 @@ Bonfire uses Firebase Realtime Database for:
 
 ### Running Tests with Emulator
 
+`test:firebase` uses `firebase emulators:exec` which **automatically starts the emulator, runs the tests, then shuts it down** — no separate terminal needed:
+
 ```bash
 cd packages/server
-
-# Terminal 1: Start emulator
-npm run firebase:emulator
-
-# Terminal 2: Run tests
 npm run test:firebase
 ```
 
-Tests automatically connect to emulator when `FIREBASE_EMULATOR_HOST` is set.
+That's it. The emulator lifecycle is fully managed by the script.
+
+**How it works:**
+- `firebase emulators:exec` starts the database emulator
+- Sets `FIREBASE_DATABASE_EMULATOR_HOST=localhost:9000` in the child process environment
+- Runs `vitest run __tests__/unit/database/FirebaseAdapter.test.ts`
+- Stops the emulator when tests complete
+
+**Normal `npm test` behavior:**
+`FirebaseAdapter` tests are skipped automatically when the emulator isn't running (they show as `·` not `×`). Only `npm run test:firebase` runs them.
+
+**Manual emulator option** (if you want the emulator running separately for development):
+```bash
+# Terminal 1: Keep emulator running
+npm run firebase:emulator
+
+# Terminal 2: Run Firebase tests (emulator already up, env var needed)
+FIREBASE_DATABASE_EMULATOR_HOST=localhost:9000 npm test
+```
 
 ---
 

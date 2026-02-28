@@ -34,10 +34,21 @@ export interface GameState {
   phase: Phase;
   players: Player[];
   playerOrder?: PlayerId[];
+  currentTurnIndex?: number;
   startedAt?: number;
   endedAt?: number;
   metadata?: Record<string, unknown>;
 }
+
+/**
+ * Strategy for handling player disconnects
+ *
+ * - 'reconnect-window' (default): mark disconnected, hold spot, timeout after disconnectTimeout
+ * - 'close-on-host-leave': if host disconnects, emit room:closed and delete room immediately
+ * - 'transfer-host': if host disconnects, promote next player to host, then apply reconnect-window
+ * - 'skip-turn': if the current turn player disconnects, advance to the next connected player
+ */
+export type DisconnectStrategy = 'reconnect-window' | 'close-on-host-leave' | 'transfer-host' | 'skip-turn';
 
 /**
  * Game configuration options
@@ -48,6 +59,7 @@ export interface GameConfig {
   phases: Phase[];
   allowJoinInProgress?: boolean;
   disconnectTimeout?: number; // milliseconds
+  disconnectStrategy?: DisconnectStrategy;
 }
 
 /**

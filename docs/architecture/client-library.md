@@ -21,19 +21,22 @@ Hooks (useGameState, useRoom, usePlayer, usePhase, useConnection, useBonfireEven
 Plain TypeScript class (no React dependency) that manages the socket connection. Can be used without React.
 
 **Promise-based methods** (wrap Socket.io callback acknowledgments):
-- `createRoom(gameType, hostName)` → `RoomCreateResponse`
-- `joinRoom(roomId, playerName)` → `RoomJoinResponse`
-- `leaveRoom()` → `BaseResponse`
+- `createRoom(gameType, hostName)` → `RoomCreateResponse` — saves session to sessionStorage
+- `joinRoom(roomId, playerName)` → `RoomJoinResponse` — saves session to sessionStorage
+- `leaveRoom()` → `BaseResponse` — clears saved session
+- `reconnectToRoom(roomId, playerId)` → `RoomReconnectResponse` — emits `room:reconnect`, restores state
 - `startGame()` → `BaseResponse`
 - `sendAction(actionType: string, payload: unknown)` → `ActionResponse` — **two args, not one object**
 - `requestState()` → `StateResponse`
+- `loadSession()` → `{ roomId, playerId } | null` — reads from sessionStorage for page-refresh reconnect
 
 **Subscription API** (each returns an unsubscribe function):
 - `onStateChange(listener)` — fired on `state:update` and `state:sync` from server
-- `onStatusChange(listener)` — connection status changes
+- `onStatusChange(listener)` — connection status changes (`'disconnected' | 'connecting' | 'connected' | 'reconnecting'`)
 - `onError(listener)` — server error events
 - `onGameEvent(eventType, listener)` — typed game event dispatching
 - `onRoomClosed(listener)` — room closed notification
+- `getSocket()` — exposes raw Socket.io socket for advanced use cases
 
 **Internal state**: Tracks `gameState`, `playerId`, `roomId`, `status` so hooks can synchronously read current values.
 
@@ -53,10 +56,11 @@ React context provider that wraps the app tree.
 |------|--------------------------|---------|
 | `useGameState()` | `{ state, requestState }` | `useSyncExternalStore` |
 | `useConnection()` | `{ status, connect, disconnect }` | `useSyncExternalStore` |
-| `useRoom()` | `{ roomId, isInRoom, createRoom, joinRoom, leaveRoom, startGame, sendAction(type, payload) }` | `useCallback` wrappers |
+| `useRoom()` | `{ roomId, isInRoom, createRoom, joinRoom, leaveRoom, startGame, sendAction(type, payload), reconnectToRoom(roomId, playerId) }` | `useCallback` wrappers |
 | `usePlayer()` | `{ player, playerId, isHost, players }` — key is `player`, not `currentPlayer` | `useMemo` derived from state |
 | `usePhase()` | `Phase \| null` — returns value directly, **not** `{ phase }` | `useMemo` derived from state |
 | `useBonfireEvent(type, handler)` | `void` | `useEffect` with auto-cleanup |
+| `useTurn()` | `{ isMyTurn, currentPlayerId, currentPlayer, turnIndex }` — requires `currentTurnIndex` in game state | `useMemo` derived from state |
 
 ### Why `useSyncExternalStore`
 
@@ -67,7 +71,7 @@ React context provider that wraps the app tree.
 
 ## Type Strategy
 
-The client package **does not depend on `@bonfire/server`**. Server response types (`BaseResponse`, `RoomCreateResponse`, etc.) and Socket.io event contracts (`ClientToServerEvents`, `ServerToClientEvents`) are duplicated in `src/types.ts`. This keeps the client free of Node.js-only dependencies (Express, firebase-admin).
+The client package **does not depend on `@bonfire/server`**. Server response types (`BaseResponse`, `RoomCreateResponse`, `RoomReconnectResponse`, etc.) are imported from `@bonfire/core/contracts.ts` — a single source of truth shared with the server. Socket.io event contracts (`ClientToServerEvents`, `ServerToClientEvents`) are defined locally in `src/types.ts`. This keeps the client free of Node.js-only dependencies (Express, firebase-admin) while eliminating type duplication.
 
 ## Testing
 
@@ -283,7 +287,8 @@ packages/client/
 │   │   ├── useRoom.ts
 │   │   ├── usePlayer.ts
 │   │   ├── usePhase.ts
-│   │   └── useBonfireEvent.ts
+│   │   ├── useBonfireEvent.ts
+│   │   └── useTurn.ts              # Turn-based game helper
 │   ├── components/
 │   │   ├── BonfireErrorBoundary.tsx
 │   │   ├── Lobby.tsx               # Pre-built lobby screen

@@ -135,6 +135,8 @@ interface GameState {
   roomId: string;
   phase: string;
   players: Player[];
+  playerOrder?: PlayerId[];       // Turn order (set by game logic)
+  currentTurnIndex?: number;      // Index into playerOrder for current turn
   startedAt?: number;
   endedAt?: number;
   metadata?: Record<string, unknown>;
@@ -149,10 +151,17 @@ Configure your game rules:
 interface GameConfig {
   minPlayers: number;       // Minimum players to start
   maxPlayers: number;       // Maximum players allowed
-  phases: string[];         // Valid game phases
+  phases: string[];         // Valid game phases (must list ALL phases upfront)
   allowJoinInProgress?: boolean;  // Allow joining after start
   disconnectTimeout?: number;     // Milliseconds before removing disconnected player
+  disconnectStrategy?: DisconnectStrategy; // How to handle player disconnects (default: 'reconnect-window')
 }
+
+type DisconnectStrategy =
+  | 'reconnect-window'    // (default) Mark disconnected, hold spot, timeout after disconnectTimeout
+  | 'close-on-host-leave' // If host disconnects, emit room:closed and delete room immediately
+  | 'transfer-host'       // If host disconnects, promote next player to host, then apply reconnect-window
+  | 'skip-turn';          // If current turn player disconnects, advance to next connected player
 ```
 
 ### Event System

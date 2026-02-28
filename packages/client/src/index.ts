@@ -12,6 +12,7 @@ export { useRoom } from './hooks/useRoom';
 export { usePlayer } from './hooks/usePlayer';
 export { usePhase } from './hooks/usePhase';
 export { useBonfireEvent } from './hooks/useBonfireEvent';
+export { useTurn } from './hooks/useTurn';
 
 // ---- Components ----
 export { BonfireErrorBoundary } from './components/BonfireErrorBoundary';

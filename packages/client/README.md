@@ -10,7 +10,7 @@ React hooks and utilities for building Bonfire party game UIs.
 
 - **BonfireClient** - Promise-based Socket.io wrapper with subscription model
 - **BonfireProvider** - React context provider with auto-connect/cleanup
-- **6 React hooks** - Type-safe hooks for state, connection, room, player, phase, and events
+- **7 React hooks** - Type-safe hooks for state, connection, room, player, phase, events, and turn management
 - **BonfireErrorBoundary** - Error boundary component for graceful error handling
 - **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
 - **colorHash utility** - Deterministic player color generation
@@ -54,14 +54,14 @@ import { GameState } from '@bonfire/core';
 // Option A: Pass config (provider creates client)
 function App() {
   return (
-    <BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
+    <BonfireProvider config={{ url: 'http://localhost:3000' }}>
       <GameUI />
     </BonfireProvider>
   );
 }
 
 // Option B: Pass pre-created client (advanced usage)
-const client = new BonfireClient({ serverUrl: 'http://localhost:3000' });
+const client = new BonfireClient({ url: 'http://localhost:3000' });
 
 function App() {
   return (
@@ -121,7 +121,7 @@ import { BonfireErrorBoundary } from '@bonfire/client';
 
 function App() {
   return (
-    <BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
+    <BonfireProvider config={{ url: 'http://localhost:3000' }}>
       <BonfireErrorBoundary
         fallback={<div>Something went wrong. <button onClick={() => window.location.reload()}>Reload</button></div>}
       >
@@ -144,8 +144,8 @@ Low-level Socket.io client wrapper. Usually used via `BonfireProvider` and hooks
 import { BonfireClient } from '@bonfire/client';
 
 const client = new BonfireClient({
-  serverUrl: 'http://localhost:3000',
-  autoConnect: true, // optional, default: true
+  url: 'http://localhost:3000',
+  autoConnect: false, // optional, default: false
 });
 ```
 
@@ -153,13 +153,17 @@ const client = new BonfireClient({
 
 ```typescript
 // Connection
-await client.connect(): Promise<void>
-await client.disconnect(): Promise<void>
+client.connect(): void
+client.disconnect(): void
 
 // Room Management
-await client.createRoom(): Promise<RoomCreateResponse>
+await client.createRoom(gameType: string, hostName: string): Promise<RoomCreateResponse>
 await client.joinRoom(roomId: string, playerName: string): Promise<RoomJoinResponse>
 await client.leaveRoom(): Promise<BaseResponse>
+await client.reconnectToRoom(roomId: string, playerId: string): Promise<RoomReconnectResponse>
+
+// Session persistence (sessionStorage)
+client.loadSession(): { roomId: string; playerId: string } | null
 
 // Game Actions
 await client.startGame(): Promise<BaseResponse>
@@ -171,16 +175,20 @@ client.onStateChange(callback: (state: GameState) => void): () => void
 client.onStatusChange(callback: (status: ConnectionStatus) => void): () => void
 client.onError(callback: (error: ErrorResponse) => void): () => void
 client.onGameEvent(eventType: string, callback: (payload: any) => void): () => void
-client.onRoomClosed(callback: () => void): () => void
+client.onRoomClosed(callback: (reason: string) => void): () => void
+
+// Advanced
+client.getSocket(): TypedClientSocket
 ```
 
 **Properties:**
 
 ```typescript
 client.gameState: GameState | null  // Current game state
-client.status: ConnectionStatus      // 'disconnected' | 'connecting' | 'connected' | 'error'
-client.currentPlayerId: string | null
-client.currentRoomId: string | null
+client.status: ConnectionStatus      // 'disconnected' | 'connecting' | 'connected' | 'reconnecting'
+client.playerId: string | null
+client.roomId: string | null
+client.isConnected: boolean
 ```
 
 ---
@@ -195,7 +203,7 @@ interface BonfireProviderProps {
   client?: BonfireClient;
 
   // Option 2: Pass config (provider creates client)
-  config?: BonfireClientConfig; // { serverUrl: string; autoConnect?: boolean }
+  config?: BonfireClientConfig; // { url: string; autoConnect?: boolean; ... }
   autoConnect?: boolean;
 
   children: React.ReactNode;
@@ -205,13 +213,13 @@ interface BonfireProviderProps {
 **Example:**
 
 ```tsx
-// Simple setup — note: use config prop, not serverUrl directly
-<BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
+// Simple setup — note: config.url, not serverUrl
+<BonfireProvider config={{ url: 'http://localhost:3000' }}>
   <App />
 </BonfireProvider>
 
 // Advanced setup with custom client
-const client = new BonfireClient({ serverUrl: process.env.SERVER_URL });
+const client = new BonfireClient({ url: process.env.SERVER_URL });
 <BonfireProvider client={client}>
   <App />
 </BonfireProvider>
@@ -290,9 +298,9 @@ Manage connection status and manual connect/disconnect.
 
 ```typescript
 function useConnection(): {
-  status: ConnectionStatus; // 'disconnected' | 'connecting' | 'connected' | 'error'
-  connect: () => Promise<void>;
-  disconnect: () => Promise<void>;
+  status: ConnectionStatus; // 'disconnected' | 'connecting' | 'connected' | 'reconnecting'
+  connect: () => void;
+  disconnect: () => void;
 }
 ```
 
@@ -327,6 +335,7 @@ function useRoom(): {
   leaveRoom: () => Promise<BaseResponse>;
   startGame: () => Promise<BaseResponse>;
   sendAction: (actionType: string, payload: unknown) => Promise<ActionResponse>;
+  reconnectToRoom: (roomId: string, playerId: string) => Promise<RoomReconnectResponse>;
 }
 ```
 
@@ -473,6 +482,63 @@ function GameNotifications() {
 ```
 
 **Auto-cleanup:** The event listener is automatically removed when the component unmounts or when the event type changes.
+
+---
+
+#### useTurn()
+
+Convenience hook for turn-based games. Derives who the current turn player is from `currentTurnIndex` in game state, eliminating manual `playerOrder` indexing in game UIs.
+
+Requires `currentTurnIndex` to be set in game state by server-side game logic.
+
+```typescript
+function useTurn(): {
+  isMyTurn: boolean;
+  currentPlayerId: PlayerId | null;
+  currentPlayer: Player | null;
+  turnIndex: number | null;
+}
+```
+
+**Example:**
+
+```tsx
+function TurnIndicator() {
+  const { isMyTurn, currentPlayer, turnIndex } = useTurn();
+
+  if (isMyTurn) return <div className="banner">Your turn!</div>;
+  return <div>Waiting for {currentPlayer?.name}…</div>;
+}
+```
+
+**Note:** Returns all nulls when `state.currentTurnIndex` or `state.playerOrder` is not set (e.g., in non-turn-based phases).
+
+---
+
+### Reconnection (Page Refresh Recovery)
+
+Bonfire automatically saves session data to `sessionStorage` whenever a player creates or joins a room. On page refresh, use `loadSession()` + `reconnectToRoom()` to restore the session:
+
+```tsx
+function App() {
+  const { reconnectToRoom } = useRoom();
+  const { client } = useBonfireContext();
+
+  useEffect(() => {
+    const session = client.loadSession();
+    if (session) {
+      reconnectToRoom(session.roomId, session.playerId);
+    }
+  }, []);
+
+  // ...
+}
+```
+
+**How it works:**
+- `createRoom` / `joinRoom` automatically save `{ roomId, playerId }` to `sessionStorage`
+- `leaveRoom` / `room:closed` automatically clear the saved session
+- `reconnectToRoom` emits `room:reconnect` to the server and restores client state on success
 
 ---
 
@@ -769,6 +835,7 @@ import type {
   BaseResponse,
   RoomCreateResponse,
   RoomJoinResponse,
+  RoomReconnectResponse,
   StateResponse,
   ActionResponse,
   ErrorResponse,
@@ -780,11 +847,14 @@ import type {
 
 ```typescript
 interface BonfireClientConfig {
-  serverUrl: string;
-  autoConnect?: boolean;
+  url: string;                          // Server URL, e.g. "http://localhost:3000"
+  socketOptions?: Record<string, unknown>;
+  autoConnect?: boolean;                // default: false
+  reconnection?: boolean;               // default: true
+  reconnectionAttempts?: number;        // default: 5
 }
 
-type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
+type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting';
 
 interface BaseResponse {
   success: boolean;
@@ -802,10 +872,14 @@ interface RoomJoinResponse extends BaseResponse {
   state?: GameState;
 }
 
+interface RoomReconnectResponse extends BaseResponse {
+  playerId?: string;
+  state?: GameState;
+}
+
 interface BonfireGameEvent {
   type: string;
-  payload: any;
-  timestamp: number;
+  payload: unknown;
 }
 ```
 
@@ -880,7 +954,7 @@ import { BonfireProvider, useGameState, useRoom, usePlayer, usePhase } from '@bo
 
 function App() {
   return (
-    <BonfireProvider config={{ serverUrl: 'http://localhost:3000' }}>
+    <BonfireProvider config={{ url: 'http://localhost:3000' }}>
       <BonfireErrorBoundary>
         <Game />
       </BonfireErrorBoundary>
@@ -974,7 +1048,7 @@ These cause silent failures with no helpful error message:
 | `sendAction` takes two args, not an object | `sendAction('type', payload)` |
 | `usePhase()` returns the value directly | `const phase = usePhase()` |
 | `handleAction()` receives a single object; player is inside | `action.playerId` |
-| `BonfireProvider` config prop, not `serverUrl` | `config={{ serverUrl }}` |
+| `BonfireProvider` uses `config={{ url }}`, not `serverUrl` | `config={{ url: serverUrl }}` |
 | `onGameStart()` does NOT auto-transition phases | call `transitionPhase()` yourself |
 | `transitionPhase()` throws if phase not in `config.phases` | list ALL phases upfront in config |
 

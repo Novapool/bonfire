@@ -10,7 +10,12 @@ import type { GameState, RoomId } from '@bonfire/core'
 import type { RoomMetadata } from '../../../src/types'
 import { FirebaseAdapter, type FirebaseAdapterConfig } from '../../../src/database/FirebaseAdapter'
 
-describe('FirebaseAdapter', () => {
+// Skip these tests unless the Firebase emulator is running.
+// To run: npm run test:firebase (auto-manages the emulator)
+// Or manually: FIREBASE_DATABASE_EMULATOR_HOST=localhost:9000 npm test
+const skipFirebase = !process.env.FIREBASE_DATABASE_EMULATOR_HOST
+
+describe.skipIf(skipFirebase)('FirebaseAdapter', () => {
   let adapter: FirebaseAdapter
   const config: FirebaseAdapterConfig = {
     projectId: 'bonfire-test',

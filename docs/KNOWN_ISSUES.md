@@ -12,7 +12,53 @@ _No active issues. All known blockers have been resolved._
 
 ---
 
+## Framework Gaps Resolved (Feb 27, 2026)
+
+The following gaps were discovered during LOIV2 development and are now fixed in the framework itself.
+
+---
+
 ## Recently Fixed
+
+### ~~No disconnect strategy configuration~~ ✅ Fixed Feb 27, 2026
+**Symptom:** Server always applied reconnect-window behavior on disconnect. No way to configure close-on-host-leave, host transfer, or turn skipping.
+**Fix:** Added `disconnectStrategy` to `GameConfig` (`'reconnect-window'` | `'close-on-host-leave'` | `'transfer-host'` | `'skip-turn'`). `SocialGame.disconnectPlayer()` applies the strategy. `SocketServer.handleDisconnect` handles `close-on-host-leave`.
+
+---
+
+### ~~No reconnect path after page refresh~~ ✅ Fixed Feb 27, 2026
+**Symptom:** Players who refreshed the page had no way back into their session — they had to re-enter the room code and name, getting a new player ID.
+**Fix:** `BonfireClient` auto-saves `{ roomId, playerId }` to `sessionStorage` on `createRoom`/`joinRoom`, clears on `leaveRoom`/`room:closed`. New `reconnectToRoom(roomId, playerId)` method (and `useRoom().reconnectToRoom`) emits `room:reconnect` to the server, which validates the player still exists and restores the session. `loadSession()` reads the saved session.
+**Usage:**
+```typescript
+// On app mount:
+const session = client.loadSession();
+if (session) await reconnectToRoom(session.roomId, session.playerId);
+```
+
+---
+
+### ~~Verbose turn-order boilerplate~~ ✅ Fixed Feb 27, 2026
+**Symptom:** Turn-based games had to manually index `state.playerOrder[state.currentTurnIndex]` in every component.
+**Fix:** Added `currentTurnIndex?: number` to `GameState`. New `useTurn()` hook exposes `{ isMyTurn, currentPlayerId, currentPlayer, turnIndex }`.
+**Usage:**
+```typescript
+const { isMyTurn, currentPlayer } = useTurn();
+if (isMyTurn) return <YourTurnBanner />;
+```
+
+---
+
+### ~~`useGameState()` always returns `GameState`, requires cast~~ ✅ Fixed Feb 27, 2026
+**Symptom:** Games with extended state had to cast at every call site: `const myState = state as MyGameState`.
+**Fix:** `useGameState<TState>()` now accepts a generic that defaults to `GameState`.
+**Usage:**
+```typescript
+const { state } = useGameState<MyGameState>();
+// state is typed as MyGameState | null — no cast needed
+```
+
+---
 
 ### ~~`broadcastEvent` missing on SocialGame~~ ✅ Fixed Feb 19, 2026
 **Symptom:** No clean way for game subclasses to push one-time custom events (e.g. `question_revealed`, `round_ended`) to clients. The underlying `synchronizer.broadcastEvent` was typed to framework-internal `GameEventType` only.

@@ -13,6 +13,7 @@ import type {
   ConnectionStatus,
   RoomCreateResponse,
   RoomJoinResponse,
+  RoomReconnectResponse,
   BaseResponse,
   ActionResponse,
   StateResponse,
@@ -99,6 +100,7 @@ export class BonfireClient {
           const host = response.state.players.find((p) => p.isHost);
           if (host) this._playerId = host.id;
           this.notifyStateListeners(response.state);
+          this.saveSession(response.roomId, host?.id ?? null);
         }
         resolve(response);
       });
@@ -113,6 +115,7 @@ export class BonfireClient {
           this._playerId = response.playerId;
           this._gameState = response.state;
           this.notifyStateListeners(response.state);
+          this.saveSession(roomId, response.playerId);
         }
         resolve(response);
       });
@@ -126,10 +129,64 @@ export class BonfireClient {
           this._roomId = null;
           this._playerId = null;
           this._gameState = null;
+          this.clearSession();
         }
         resolve(response);
       });
     });
+  }
+
+  reconnectToRoom(roomId: RoomId, playerId: PlayerId): Promise<RoomReconnectResponse> {
+    return new Promise((resolve) => {
+      this.socket.emit('room:reconnect', roomId, playerId, (response: RoomReconnectResponse) => {
+        if (response.success && response.state && response.playerId) {
+          this._roomId = roomId;
+          this._playerId = response.playerId;
+          this._gameState = response.state;
+          this.notifyStateListeners(response.state);
+        }
+        resolve(response);
+      });
+    });
+  }
+
+  /** Read a previously saved session from sessionStorage. Returns null if missing or malformed. */
+  loadSession(): { roomId: RoomId; playerId: PlayerId } | null {
+    try {
+      const raw = sessionStorage.getItem('bonfire_session');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as unknown;
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        'roomId' in parsed &&
+        'playerId' in parsed &&
+        typeof (parsed as any).roomId === 'string' &&
+        typeof (parsed as any).playerId === 'string'
+      ) {
+        return { roomId: (parsed as any).roomId, playerId: (parsed as any).playerId };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  private saveSession(roomId: RoomId, playerId: PlayerId | null): void {
+    if (!playerId) return;
+    try {
+      sessionStorage.setItem('bonfire_session', JSON.stringify({ roomId, playerId }));
+    } catch {
+      // sessionStorage may be unavailable (e.g., tests)
+    }
+  }
+
+  private clearSession(): void {
+    try {
+      sessionStorage.removeItem('bonfire_session');
+    } catch {
+      // sessionStorage may be unavailable
+    }
   }
 
   // ---- Game Operations ----
@@ -247,6 +304,7 @@ export class BonfireClient {
       this._roomId = null;
       this._playerId = null;
       this._gameState = null;
+      this.clearSession();
       this.roomClosedListeners.forEach((l) => l(reason));
     });
   }

@@ -13,6 +13,7 @@ import type {
   BaseResponse,
   RoomCreateResponse,
   RoomJoinResponse,
+  RoomReconnectResponse,
   StateResponse,
   ActionResponse,
   ErrorResponse,
@@ -168,6 +169,9 @@ export interface ClientToServerEvents {
 
   /** Request current state (reconnection) */
   'state:request': (callback: (response: StateResponse) => void) => void
+
+  /** Reconnect to a room after page refresh using saved session */
+  'room:reconnect': (roomId: RoomId, playerId: PlayerId, callback: (response: RoomReconnectResponse) => void) => void
 }
 
 /**
@@ -196,6 +200,7 @@ export type {
   BaseResponse,
   RoomCreateResponse,
   RoomJoinResponse,
+  RoomReconnectResponse,
   StateResponse,
   ActionResponse,
   ErrorResponse,

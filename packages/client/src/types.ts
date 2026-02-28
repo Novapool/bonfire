@@ -12,6 +12,7 @@ import type {
   BaseResponse,
   RoomCreateResponse,
   RoomJoinResponse,
+  RoomReconnectResponse,
   StateResponse,
   ActionResponse,
   ErrorResponse,
@@ -42,6 +43,7 @@ export type {
   BaseResponse,
   RoomCreateResponse,
   RoomJoinResponse,
+  RoomReconnectResponse,
   StateResponse,
   ActionResponse,
   ErrorResponse,
@@ -56,6 +58,7 @@ export interface ClientToServerEvents {
   'game:start': (callback?: (response: BaseResponse) => void) => void;
   'game:action': (actionType: string, payload: unknown, callback?: (response: ActionResponse) => void) => void;
   'state:request': (callback: (response: StateResponse) => void) => void;
+  'room:reconnect': (roomId: RoomId, playerId: PlayerId, callback: (response: RoomReconnectResponse) => void) => void;
 }
 
 export interface ServerToClientEvents {

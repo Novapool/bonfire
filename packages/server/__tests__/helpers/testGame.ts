@@ -2,7 +2,7 @@
  * Test game implementation for unit tests
  */
 
-import { SocialGame, type GameState, type GameConfig, type RoomId } from '@bonfire/core'
+import { SocialGame, type GameState, type GameConfig, type RoomId, type PlayerAction } from '@bonfire/core'
 import type { SocketStateSynchronizer } from '../../src/core/SocketStateSynchronizer'
 
 /**
@@ -57,6 +57,10 @@ export class TestGame extends SocialGame<TestGameState> {
   protected async onGameEnd(): Promise<void> {
     // Change phase to 'ended' when game ends
     this.state.phase = 'ended'
+  }
+
+  async handleAction(_action: PlayerAction): Promise<any> {
+    return { success: false, error: 'Not implemented', code: 'NOT_IMPLEMENTED' }
   }
 }
 

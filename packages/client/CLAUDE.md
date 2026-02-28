@@ -16,7 +16,7 @@ This package provides the client-side React integration for Bonfire games:
 - **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
 - **colorHash utility** - Deterministic player color generation from names
 - **Storybook 8** - Interactive component documentation
-- **Tailwind CSS** - Components use standard Tailwind utilities only (no custom tokens)
+- **Inline styles** - Components use inline styles via a shared `src/utils/theme.ts` token file. No Tailwind required — components render correctly with zero consumer setup
 - **MockBonfireClient** - Test utility for simulating client behavior
 
 ---

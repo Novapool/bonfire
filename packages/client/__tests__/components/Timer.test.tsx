@@ -11,10 +11,10 @@ describe('Timer', () => {
 
   it('should render different sizes', () => {
     const { rerender, container } = render(<Timer duration={30} size="sm" autoStart={false} />);
-    expect(container.querySelector('.w-16')).toBeInTheDocument();
+    expect(container.querySelector('[role="timer"]')).toHaveStyle({ width: '4rem', height: '4rem' });
 
     rerender(<Timer duration={30} size="lg" autoStart={false} />);
-    expect(container.querySelector('.w-32')).toBeInTheDocument();
+    expect(container.querySelector('[role="timer"]')).toHaveStyle({ width: '8rem', height: '8rem' });
   });
 
   it('should show progress ring by default', () => {
@@ -29,16 +29,14 @@ describe('Timer', () => {
 
   it('should apply correct variant colors', () => {
     const { rerender, container } = render(<Timer duration={30} variant="default" autoStart={false} />);
-    let timeDisplay = container.querySelector('.text-indigo-500');
-    expect(timeDisplay).toBeInTheDocument();
+    const timeDisplay = container.querySelector('[role="timer"] span');
+    expect(timeDisplay).toHaveStyle({ color: '#6366f1' });
 
     rerender(<Timer duration={30} variant="warning" autoStart={false} />);
-    timeDisplay = container.querySelector('.text-amber-500');
-    expect(timeDisplay).toBeInTheDocument();
+    expect(timeDisplay).toHaveStyle({ color: '#f59e0b' });
 
     rerender(<Timer duration={30} variant="danger" autoStart={false} />);
-    timeDisplay = container.querySelector('.text-red-500');
-    expect(timeDisplay).toBeInTheDocument();
+    expect(timeDisplay).toHaveStyle({ color: '#ef4444' });
   });
 
   it('should have descriptive aria-label', () => {

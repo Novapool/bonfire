@@ -245,10 +245,9 @@
 **Status:** ✅ Complete (Feb 12, 2026)
 
 ### Phase 1: Infrastructure ✅ Complete
-- [x] 🟢 Tailwind CSS v4 configured with @theme directive for design tokens
-- [x] 🟢 PostCSS build pipeline (`npm run build:css`)
 - [x] 🟢 Storybook 8 installed and configured with BonfireProvider decorator
-- [x] 🟢 Design system tokens (colors, spacing, typography, animations)
+- [x] 🟢 Design system tokens extracted to `src/utils/theme.ts` (colors, radius, shadows)
+- [x] 🟢 All 8 UI components converted to inline styles — no Tailwind or external CSS required
 
 ### Phase 2: Core Components ✅ Complete
 - [x] 🟢 `<PlayerAvatar>` - Player initials, deterministic color hash, status indicator, host badge (5 sizes: xs/sm/md/lg/xl, 13 tests)
@@ -275,7 +274,7 @@
 - **8 reusable UI components** exported from `@bonfire/client`: Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
 - **colorHash utility** for deterministic player color assignment
 - **Storybook 8** with full story coverage for all components
-- **Tailwind CSS v4** design system with tokens for brand colors, surface, text variants, animations
+- **Inline styles** via shared `src/utils/theme.ts` constants — zero external CSS dependencies, no consumer setup required
 - **205 tests** across all components, all passing
 
 **Architecture Documentation:** See `docs/architecture/client-library.md` for component API reference.

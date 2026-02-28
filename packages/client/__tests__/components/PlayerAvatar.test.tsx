@@ -24,45 +24,45 @@ describe('PlayerAvatar', () => {
   it('should render different sizes', () => {
     const { rerender, container } = render(<PlayerAvatar name="Alice" size="xs" />);
     let avatar = container.querySelector('[role="img"]');
-    expect(avatar).toHaveClass('w-6', 'h-6', 'text-xs');
+    expect(avatar).toHaveStyle({ width: '1.5rem', height: '1.5rem', fontSize: '0.75rem' });
 
     rerender(<PlayerAvatar name="Alice" size="xl" />);
     avatar = container.querySelector('[role="img"]');
-    expect(avatar).toHaveClass('w-24', 'h-24', 'text-3xl');
+    expect(avatar).toHaveStyle({ width: '6rem', height: '6rem', fontSize: '1.875rem' });
   });
 
   it('should show online status indicator when showStatus is true', () => {
     const { container } = render(
       <PlayerAvatar name="Alice" showStatus isOnline />
     );
-    const status = container.querySelector('.bg-green-500');
+    const status = container.querySelector('[data-testid="status-indicator"]');
     expect(status).toBeInTheDocument();
+    expect(status).toHaveStyle({ backgroundColor: '#10b981' });
   });
 
   it('should show offline status indicator', () => {
     const { container } = render(
       <PlayerAvatar name="Alice" showStatus isOnline={false} />
     );
-    const status = container.querySelector('.bg-gray-400');
+    const status = container.querySelector('[data-testid="status-indicator"]');
     expect(status).toBeInTheDocument();
+    expect(status).toHaveStyle({ backgroundColor: '#9ca3af' });
   });
 
   it('should not show status indicator by default', () => {
     const { container } = render(<PlayerAvatar name="Alice" />);
-    const status = container.querySelector('.bg-green-500, .bg-gray-400');
-    expect(status).not.toBeInTheDocument();
+    expect(container.querySelector('[data-testid="status-indicator"]')).not.toBeInTheDocument();
   });
 
   it('should show host crown when isHost is true', () => {
     const { container } = render(<PlayerAvatar name="Alice" isHost />);
-    const crown = container.querySelector('.bg-yellow-400');
+    const crown = container.querySelector('[title="Host"]');
     expect(crown).toBeInTheDocument();
   });
 
   it('should not show host crown by default', () => {
     const { container } = render(<PlayerAvatar name="Alice" />);
-    const crown = container.querySelector('.bg-yellow-400');
-    expect(crown).not.toBeInTheDocument();
+    expect(container.querySelector('[title="Host"]')).not.toBeInTheDocument();
   });
 
   it('should include name in title attribute', () => {

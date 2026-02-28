@@ -15,7 +15,7 @@ React hooks and utilities for building Bonfire party game UIs.
 - **8 UI components** - Lobby, PlayerAvatar, Timer, PromptCard, ResponseInput, RevealPhase, GameProgress, VotingInterface
 - **colorHash utility** - Deterministic player color generation
 - **Storybook 8** - Visual documentation for all components
-- **Tailwind CSS v4** - Design system with party-game tokens
+- **Inline styles** - Zero-dependency styling via shared `theme.ts` constants — no CSS setup required
 - **useSyncExternalStore** - Native React 18 external state synchronization
 - **TypeScript** - Full type safety for game state and events
 - **Comprehensive tests** - MockBonfireClient for easy testing
@@ -581,7 +581,7 @@ interface BonfireErrorBoundaryProps {
 
 ## UI Components
 
-Pre-built React components for common party game UI patterns. Requires Tailwind CSS v4 (included in the package) and running `npm run build:css`.
+Pre-built React components for common party game UI patterns. Components use inline styles — no Tailwind or external CSS required. Import and use with zero consumer setup.
 
 ### PlayerAvatar
 

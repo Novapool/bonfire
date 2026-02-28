@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { C, radius } from '../utils/theme';
 
 export interface VoteOption {
   id: string;
@@ -40,14 +41,13 @@ interface VoteBarProps {
 const VoteBar: React.FC<VoteBarProps> = ({ count, total }) => {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
-    <div className="mt-2 space-y-0.5">
-      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+    <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+      <div style={{ height: '0.375rem', width: '100%', backgroundColor: C.gray200, borderRadius: radius.full, overflow: 'hidden' }}>
         <div
-          className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-          style={{ width: `${pct}%` }}
+          style={{ height: '100%', backgroundColor: C.indigo500, borderRadius: radius.full, transition: 'width 0.5s ease', width: `${pct}%` }}
         />
       </div>
-      <div className="flex justify-between text-xs text-gray-500">
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: C.gray500 }}>
         <span>{count} vote{count !== 1 ? 's' : ''}</span>
         <span>{pct}%</span>
       </div>
@@ -71,25 +71,44 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
   className = '',
   style,
 }) => {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   const maxVotes = showResults
     ? Math.max(0, ...options.map((o) => voteCounts[o.id] ?? 0))
     : 0;
 
   return (
     <div
-      className={`space-y-3 ${className}`}
-      style={style}
+      className={className}
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', ...style }}
       role="radiogroup"
       aria-label={title || 'Vote options'}
     >
       {title && (
-        <h2 className="text-lg font-bold text-gray-900 text-center mb-2">{title}</h2>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: C.gray900, textAlign: 'center', marginBottom: '0.5rem', marginTop: 0 }}>
+          {title}
+        </h2>
       )}
 
       {options.map((option) => {
         const selected = currentVote === option.id;
         const count = voteCounts[option.id] ?? 0;
         const isWinner = showResults && count === maxVotes && maxVotes > 0;
+        const hovered = hoveredId === option.id && !disabled && !selected && !isWinner;
+
+        let borderColor: string = hovered ? C.indigo200 : C.gray200;
+        let bg: string = C.white;
+        let labelColor: string = C.gray900;
+
+        if (selected) {
+          borderColor = C.indigo500;
+          bg = C.indigo50;
+          labelColor = C.indigo600;
+        } else if (isWinner) {
+          borderColor = C.yellow400;
+          bg = C.yellow50;
+          labelColor = C.yellow700;
+        }
 
         return (
           <button
@@ -99,46 +118,61 @@ export const VotingInterface: React.FC<VotingInterfaceProps> = ({
             aria-checked={selected}
             onClick={() => !disabled && onVote?.(option.id)}
             disabled={disabled && !showResults}
-            className={`
-              w-full text-left px-5 py-4 rounded-xl border-2 transition-all
-              ${selected
-                ? 'border-indigo-500 bg-indigo-50'
-                : isWinner
-                  ? 'border-yellow-400 bg-yellow-50'
-                  : 'border-gray-200 bg-white hover:border-indigo-200'
-              }
-              ${disabled && !showResults ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
-            `.trim()}
+            onMouseEnter={() => setHoveredId(option.id)}
+            onMouseLeave={() => setHoveredId(null)}
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              padding: '1rem 1.25rem',
+              borderRadius: radius.lg,
+              border: `2px solid ${borderColor}`,
+              backgroundColor: bg,
+              transition: 'all 0.15s ease',
+              opacity: disabled && !showResults ? 0.6 : 1,
+              cursor: disabled && !showResults ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit',
+              fontSize: '1rem',
+            }}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <span
-                  className={`font-semibold block ${selected ? 'text-indigo-600' : isWinner ? 'text-yellow-700' : 'text-gray-900'}`}
-                >
-                  {isWinner && <span aria-hidden="true" className="mr-1">🏆</span>}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontWeight: 600, display: 'block', color: labelColor }}>
+                  {isWinner && <span aria-hidden="true" style={{ marginRight: '0.25rem' }}>🏆</span>}
                   {option.label}
                 </span>
                 {option.description && (
-                  <span className="text-sm text-gray-500 block mt-0.5">{option.description}</span>
+                  <span style={{ fontSize: '0.875rem', color: C.gray500, display: 'block', marginTop: '0.125rem' }}>
+                    {option.description}
+                  </span>
                 )}
                 {option.author && (
-                  <span className="text-xs text-gray-500 block mt-0.5">— {option.author}</span>
+                  <span style={{ fontSize: '0.75rem', color: C.gray500, display: 'block', marginTop: '0.125rem' }}>
+                    — {option.author}
+                  </span>
                 )}
               </div>
               {selected && !showResults && (
                 <span
-                  className="w-5 h-5 rounded-full bg-indigo-500 flex-shrink-0 flex items-center justify-center mt-0.5"
+                  style={{
+                    width: '1.25rem',
+                    height: '1.25rem',
+                    borderRadius: radius.full,
+                    backgroundColor: C.indigo500,
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '0.125rem',
+                  }}
                   aria-hidden="true"
                 >
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg style={{ width: '0.75rem', height: '0.75rem', color: C.white }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
               )}
             </div>
-            {showResults && (
-              <VoteBar count={count} total={totalVoters} />
-            )}
+            {showResults && <VoteBar count={count} total={totalVoters} />}
           </button>
         );
       })}

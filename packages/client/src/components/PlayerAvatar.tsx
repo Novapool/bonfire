@@ -1,5 +1,6 @@
 import React from 'react';
 import { getPlayerColor, getPlayerInitials } from '../utils/colorHash';
+import { C, radius } from '../utils/theme';
 
 export interface PlayerAvatarProps {
   /** Player name to display */
@@ -16,37 +17,37 @@ export interface PlayerAvatarProps {
   isHost?: boolean;
   /** Additional CSS classes */
   className?: string;
-  /** Inline styles for the root element (merged with internal backgroundColor) */
+  /** Inline styles for the root element (merged with internal styles) */
   style?: React.CSSProperties;
 }
 
-const sizeClasses = {
-  xs: 'w-6 h-6 text-xs',
-  sm: 'w-8 h-8 text-sm',
-  md: 'w-12 h-12 text-base',
-  lg: 'w-16 h-16 text-xl',
-  xl: 'w-24 h-24 text-3xl',
+const sizeDims: Record<NonNullable<PlayerAvatarProps['size']>, React.CSSProperties> = {
+  xs: { width: '1.5rem', height: '1.5rem', fontSize: '0.75rem' },
+  sm: { width: '2rem',   height: '2rem',   fontSize: '0.875rem' },
+  md: { width: '3rem',   height: '3rem',   fontSize: '1rem' },
+  lg: { width: '4rem',   height: '4rem',   fontSize: '1.25rem' },
+  xl: { width: '6rem',   height: '6rem',   fontSize: '1.875rem' },
 };
 
-const statusSizeClasses = {
-  xs: 'w-1.5 h-1.5 border',
-  sm: 'w-2 h-2 border',
-  md: 'w-2.5 h-2.5 border-2',
-  lg: 'w-3 h-3 border-2',
-  xl: 'w-4 h-4 border-2',
+const statusDims: Record<NonNullable<PlayerAvatarProps['size']>, React.CSSProperties> = {
+  xs: { width: '0.375rem', height: '0.375rem', borderWidth: '1px' },
+  sm: { width: '0.5rem',   height: '0.5rem',   borderWidth: '1px' },
+  md: { width: '0.625rem', height: '0.625rem', borderWidth: '2px' },
+  lg: { width: '0.75rem',  height: '0.75rem',  borderWidth: '2px' },
+  xl: { width: '1rem',     height: '1rem',     borderWidth: '2px' },
 };
 
-const crownSizeClasses = {
-  xs: 'w-3 h-3 -top-1 -right-1',
-  sm: 'w-4 h-4 -top-1.5 -right-1.5',
-  md: 'w-5 h-5 -top-2 -right-2',
-  lg: 'w-6 h-6 -top-2 -right-2',
-  xl: 'w-8 h-8 -top-3 -right-3',
+const crownDims: Record<NonNullable<PlayerAvatarProps['size']>, React.CSSProperties> = {
+  xs: { width: '0.75rem', height: '0.75rem', top: '-0.25rem',  right: '-0.25rem' },
+  sm: { width: '1rem',    height: '1rem',    top: '-0.375rem', right: '-0.375rem' },
+  md: { width: '1.25rem', height: '1.25rem', top: '-0.5rem',   right: '-0.5rem' },
+  lg: { width: '1.5rem',  height: '1.5rem',  top: '-0.5rem',   right: '-0.5rem' },
+  xl: { width: '2rem',    height: '2rem',    top: '-0.75rem',  right: '-0.75rem' },
 };
 
 /**
- * PlayerAvatar component displays a player's avatar with initials and color
- * Supports online status indicator and host crown badge
+ * PlayerAvatar component displays a player's avatar with initials and color.
+ * Supports online status indicator and host crown badge.
  */
 export const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
   name,
@@ -63,36 +64,62 @@ export const PlayerAvatar: React.FC<PlayerAvatarProps> = ({
 
   return (
     <div
-      className={`relative inline-flex items-center justify-center rounded-full font-semibold text-white select-none ${sizeClasses[size]} ${className}`}
-      style={{ backgroundColor, ...style }}
+      className={className}
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: radius.full,
+        fontWeight: 600,
+        color: C.white,
+        userSelect: 'none',
+        flexShrink: 0,
+        backgroundColor,
+        ...sizeDims[size],
+        ...style,
+      }}
       title={name}
       role="img"
       aria-label={`${name}${isHost ? ' (host)' : ''}${showStatus ? ` (${isOnline ? 'online' : 'offline'})` : ''}`}
     >
-      {/* Initials */}
       <span>{initials}</span>
 
-      {/* Status indicator */}
       {showStatus && (
         <span
-          className={`absolute bottom-0 right-0 rounded-full border-white ${statusSizeClasses[size]} ${
-            isOnline ? 'bg-green-500' : 'bg-gray-400'
-          }`}
+          data-testid="status-indicator"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            borderRadius: radius.full,
+            borderStyle: 'solid',
+            borderColor: C.white,
+            backgroundColor: isOnline ? C.green500 : C.gray400,
+            ...statusDims[size],
+          }}
           aria-hidden="true"
         />
       )}
 
-      {/* Host crown */}
       {isHost && (
         <span
-          className={`absolute rounded-full bg-yellow-400 flex items-center justify-center ${crownSizeClasses[size]}`}
+          style={{
+            position: 'absolute',
+            borderRadius: radius.full,
+            backgroundColor: C.yellow400,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            ...crownDims[size],
+          }}
           aria-hidden="true"
           title="Host"
         >
           <svg
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-3/4 h-3/4 text-yellow-600"
+            style={{ width: '75%', height: '75%', color: C.yellow600 }}
           >
             <path d="M12 2L15 8.5L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L9 8.5L12 2Z" />
           </svg>

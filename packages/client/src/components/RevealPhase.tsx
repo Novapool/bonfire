@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { C, radius } from '../utils/theme';
 
 export interface RevealItem {
   id: string;
@@ -31,29 +32,52 @@ export interface RevealPhaseProps {
 
 const defaultRenderItem = (item: RevealItem, index: number, revealed: boolean) => (
   <div
-    className={`
-      flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-500
-      ${revealed
-        ? 'border-indigo-200 bg-indigo-50 opacity-100 translate-y-0'
-        : 'border-transparent bg-white opacity-0 translate-y-2'
-      }
-    `.trim()}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem',
+      padding: '1rem 1.25rem',
+      borderRadius: radius.lg,
+      border: `2px solid ${revealed ? C.indigo200 : 'transparent'}`,
+      backgroundColor: revealed ? C.indigo50 : C.white,
+      opacity: revealed ? 1 : 0,
+      transform: revealed ? 'translateY(0)' : 'translateY(0.5rem)',
+      transition: 'all 0.5s ease',
+    }}
     aria-hidden={!revealed}
   >
     <span
-      className="w-8 h-8 rounded-full bg-indigo-500 text-white text-sm font-bold flex items-center justify-center flex-shrink-0"
+      style={{
+        width: '2rem',
+        height: '2rem',
+        borderRadius: radius.full,
+        backgroundColor: C.indigo500,
+        color: C.white,
+        fontSize: '0.875rem',
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
       aria-hidden="true"
     >
       {index + 1}
     </span>
-    <div className="flex-1 min-w-0">
-      <p className="font-semibold text-gray-900 truncate">{item.label}</p>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <p style={{ fontWeight: 600, color: C.gray900, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {item.label}
+      </p>
       {item.sublabel && (
-        <p className="text-sm text-gray-500 truncate">{item.sublabel}</p>
+        <p style={{ fontSize: '0.875rem', color: C.gray500, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {item.sublabel}
+        </p>
       )}
     </div>
     {item.meta && (
-      <span className="text-sm font-semibold text-indigo-500 flex-shrink-0">{item.meta}</span>
+      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: C.indigo500, flexShrink: 0 }}>
+        {item.meta}
+      </span>
     )}
   </div>
 );
@@ -98,17 +122,22 @@ export const RevealPhase: React.FC<RevealPhaseProps> = ({
   }, [revealAll, revealedCount, items.length, revealDelay, reveal]);
 
   return (
-    <div className={`space-y-3 ${className}`} style={style} role="list" aria-label={title || 'Reveal list'}>
+    <div
+      className={className}
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', ...style }}
+      role="list"
+      aria-label={title || 'Reveal list'}
+    >
       {title && (
-        <h2 className="text-lg font-bold text-gray-900 text-center mb-4">{title}</h2>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: C.gray900, textAlign: 'center', marginBottom: '1rem', marginTop: 0 }}>
+          {title}
+        </h2>
       )}
       {items.map((item, index) => {
         const revealed = index < revealedCount;
         return (
           <div key={item.id} role="listitem">
-            {renderItem
-              ? renderItem(item, index, revealed)
-              : defaultRenderItem(item, index, revealed)}
+            {renderItem ? renderItem(item, index, revealed) : defaultRenderItem(item, index, revealed)}
           </div>
         );
       })}

@@ -1,6 +1,6 @@
 # IN-PROGRESS - Bonfire
 
-**Last Updated:** February 27, 2026 (Disconnect strategies + reconnect + DX hooks)
+**Last Updated:** February 28, 2026 (UI components converted to inline styles)
 
 ---
 
@@ -27,7 +27,15 @@ It has its own `CLAUDE.md`, `IN-PROGRESS.md`, and `docs/` with everything needed
 
 ## Recently Completed
 
-1. **Disconnect Strategies + Reconnect System + DX Hooks** (Feb 27, 2026)
+1. **Convert UI components to inline styles** (Feb 28, 2026)
+   - ✅ New `src/utils/theme.ts` — shared color, radius, and shadow constants used by all 8 UI components
+   - ✅ All 8 components (PlayerAvatar, PromptCard, Timer, ResponseInput, Lobby, GameProgress, RevealPhase, VotingInterface) migrated from Tailwind utility classes to inline styles
+   - ✅ Zero external CSS dependencies — consumers no longer need Tailwind installed or configured
+   - ✅ Tests updated to assert on inline styles and `data-testid` instead of Tailwind class names
+   - ✅ `packages/client/CLAUDE.md` updated to reflect inline styles
+   - ✅ `docs/KNOWN_ISSUES.md` updated to mark the Tailwind token bug as fixed
+
+2. **Disconnect Strategies + Reconnect System + DX Hooks** (Feb 27, 2026)
    - ✅ `DisconnectStrategy` type added to `GameConfig` (`reconnect-window` | `close-on-host-leave` | `transfer-host` | `skip-turn`)
    - ✅ `currentTurnIndex?: number` added to `GameState` (needed for `skip-turn` + `useTurn`)
    - ✅ `transferHost()` + `handleSkipTurn()` added to `SocialGame`, wired into `disconnectPlayer()`
@@ -125,7 +133,7 @@ _No active blockers. See `docs/KNOWN_ISSUES.md` for the canonical issue tracker.
 - 1 utility: colorHash
 - 205 tests, all passing
 - Storybook 8 with full story coverage
-- Tailwind CSS v4 with design system tokens
+- Inline styles via `src/utils/theme.ts` — zero external CSS dependencies
 
 **Key Decisions:**
 - Chose npm workspaces over Turborepo for simplicity (can migrate later)
@@ -139,13 +147,13 @@ _No active blockers. See `docs/KNOWN_ISSUES.md` for the canonical issue tracker.
 - docs/MILESTONES.md ✅ (updated Feb 19, 2026)
 - docs/architecture/core-classes.md ✅ (updated Feb 19, 2026)
 - docs/architecture/server-infrastructure.md ✅
-- docs/architecture/client-library.md ✅ (updated Feb 19, 2026)
+- docs/architecture/client-library.md ✅ (updated Feb 28, 2026)
 - docs/api/FIREBASE.md ✅
 - docs/api/ADMIN_API.md ✅
-- docs/KNOWN_ISSUES.md ✅ (created Feb 19, 2026)
-- IN-PROGRESS.md ✅ (updated Feb 19, 2026)
+- docs/KNOWN_ISSUES.md ✅ (updated Feb 28, 2026)
+- IN-PROGRESS.md ✅ (updated Feb 28, 2026)
 - packages/core/README.md ✅
 - packages/server/README.md ✅
 - packages/server/CLAUDE.md ✅ (updated Feb 19, 2026)
-- packages/client/README.md ✅ (updated Feb 19, 2026)
-- packages/client/CLAUDE.md ✅
+- packages/client/README.md ✅ (updated Feb 28, 2026)
+- packages/client/CLAUDE.md ✅ (updated Feb 28, 2026)

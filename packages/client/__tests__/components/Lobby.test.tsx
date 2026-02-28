@@ -191,10 +191,9 @@ describe('Lobby', () => {
     const copyButton = screen.getByRole('button', { name: 'Copy room code' });
     fireEvent.click(copyButton);
 
-    // Should show checkmark icon (svg with path for checkmark)
+    // Should show checkmark icon after copy
     await waitFor(() => {
-      const svg = copyButton.querySelector('svg.text-green-500');
-      expect(svg).toBeInTheDocument();
+      expect(copyButton.querySelector('[data-testid="copied-icon"]')).toBeInTheDocument();
     });
   });
 

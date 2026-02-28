@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { C, radius, shadow } from '../utils/theme';
 
 export type PromptVariant = 'standard' | 'spicy' | 'creative' | 'dare';
 
@@ -25,33 +26,39 @@ export interface PromptCardProps {
   animate?: boolean;
 }
 
-const variantConfig: Record<PromptVariant, { bg: string; border: string; badge: string; badgeText: string; icon: string }> = {
+const variantConfig: Record<PromptVariant, {
+  borderColor: string;
+  badgeBg: string;
+  badgeColor: string;
+  badgeText: string;
+  icon: string;
+}> = {
   standard: {
-    bg: 'bg-white',
-    border: 'border-indigo-200',
-    badge: 'bg-indigo-50 text-indigo-600',
-    badgeText: 'Standard',
+    borderColor: C.indigo200,
+    badgeBg:    C.indigo50,
+    badgeColor: C.indigo600,
+    badgeText:  'Standard',
     icon: '💬',
   },
   spicy: {
-    bg: 'bg-white',
-    border: 'border-red-200',
-    badge: 'bg-red-100 text-red-700',
-    badgeText: 'Spicy',
+    borderColor: C.red200,
+    badgeBg:    C.red100,
+    badgeColor: C.red700,
+    badgeText:  'Spicy',
     icon: '🌶️',
   },
   creative: {
-    bg: 'bg-white',
-    border: 'border-purple-200',
-    badge: 'bg-purple-100 text-purple-700',
-    badgeText: 'Creative',
+    borderColor: C.purple200,
+    badgeBg:    C.purple100,
+    badgeColor: C.purple700,
+    badgeText:  'Creative',
     icon: '🎨',
   },
   dare: {
-    bg: 'bg-white',
-    border: 'border-orange-200',
-    badge: 'bg-orange-100 text-orange-700',
-    badgeText: 'Dare',
+    borderColor: C.orange200,
+    badgeBg:    C.orange100,
+    badgeColor: C.orange700,
+    badgeText:  'Dare',
     icon: '⚡',
   },
 };
@@ -72,48 +79,61 @@ export const PromptCard: React.FC<PromptCardProps> = ({
   style,
   animate: _animate = false,
 }) => {
-  const config = variantConfig[variant];
+  const cfg = variantConfig[variant];
 
   return (
     <div
-      className={`
-        rounded-xl border-2 shadow-md p-6
-        ${config.bg} ${config.border}
-        ${className}
-      `.trim()}
-      style={style}
+      className={className}
+      style={{
+        borderRadius: radius.lg,
+        border: `2px solid ${cfg.borderColor}`,
+        boxShadow: shadow.md,
+        padding: '1.5rem',
+        backgroundColor: C.white,
+        ...style,
+      }}
       role="article"
       aria-label="Game prompt"
     >
       {/* Header: round info and variant badge */}
-      <div className="flex items-center justify-between mb-4">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         {round !== undefined ? (
-          <span className="text-sm text-gray-500">
+          <span style={{ fontSize: '0.875rem', color: C.gray500 }}>
             Round {round}{totalRounds !== undefined ? ` of ${totalRounds}` : ''}
           </span>
         ) : (
           <span />
         )}
         <span
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${config.badge}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+            padding: '0.25rem 0.5rem',
+            borderRadius: radius.full,
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            backgroundColor: cfg.badgeBg,
+            color: cfg.badgeColor,
+          }}
         >
-          <span aria-hidden="true">{config.icon}</span>
-          {category || config.badgeText}
+          <span aria-hidden="true">{cfg.icon}</span>
+          {category || cfg.badgeText}
         </span>
       </div>
 
       {/* Prompt text */}
-      <p className="text-xl font-semibold text-center leading-relaxed text-gray-900 mb-2">
+      <p style={{ fontSize: '1.25rem', fontWeight: 600, textAlign: 'center', lineHeight: '1.625', color: C.gray900, marginBottom: '0.5rem', marginTop: 0 }}>
         {prompt}
       </p>
 
-      {/* Subtitle / instructions */}
       {subtitle && (
-        <p className="text-sm text-center text-gray-500 mt-2">{subtitle}</p>
+        <p style={{ fontSize: '0.875rem', textAlign: 'center', color: C.gray500, marginTop: '0.5rem', marginBottom: 0 }}>
+          {subtitle}
+        </p>
       )}
 
-      {/* Additional slot content */}
-      {children && <div className="mt-4">{children}</div>}
+      {children && <div style={{ marginTop: '1rem' }}>{children}</div>}
     </div>
   );
 };

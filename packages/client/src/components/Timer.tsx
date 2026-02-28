@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { C } from '../utils/theme';
 
 export interface TimerProps {
   /** Duration in seconds */
@@ -19,27 +20,21 @@ export interface TimerProps {
   autoStart?: boolean;
 }
 
-const sizeClasses = {
-  sm: 'w-16 h-16 text-lg',
-  md: 'w-24 h-24 text-3xl',
-  lg: 'w-32 h-32 text-5xl',
+const sizeDims: Record<NonNullable<TimerProps['size']>, React.CSSProperties> = {
+  sm: { width: '4rem',  height: '4rem',  fontSize: '1.125rem' },
+  md: { width: '6rem',  height: '6rem',  fontSize: '1.875rem' },
+  lg: { width: '8rem',  height: '8rem',  fontSize: '3rem' },
 };
 
-const variantColors = {
-  default: 'text-indigo-500',
-  warning: 'text-amber-500',
-  danger: 'text-red-500',
-};
-
-const progressColors = {
-  default: '#6366f1',
-  warning: '#f59e0b',
-  danger: '#ef4444',
+const variantColors: Record<NonNullable<TimerProps['variant']>, string> = {
+  default: C.indigo500,
+  warning: C.amber500,
+  danger:  C.red500,
 };
 
 /**
- * Countdown timer with visual feedback and optional progress ring
- * Automatically transitions between variants based on remaining time
+ * Countdown timer with visual feedback and optional progress ring.
+ * Automatically transitions between variants based on remaining time.
  */
 export const Timer: React.FC<TimerProps> = ({
   duration,
@@ -56,12 +51,11 @@ export const Timer: React.FC<TimerProps> = ({
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>();
 
-  // Determine variant based on time left
   const getVariant = (): 'default' | 'warning' | 'danger' => {
     if (initialVariant !== 'default') return initialVariant;
-    const percentLeft = (timeLeft / duration) * 100;
-    if (percentLeft <= 25) return 'danger';
-    if (percentLeft <= 50) return 'warning';
+    const pct = (timeLeft / duration) * 100;
+    if (pct <= 25) return 'danger';
+    if (pct <= 50) return 'warning';
     return 'default';
   };
 
@@ -76,9 +70,7 @@ export const Timer: React.FC<TimerProps> = ({
     const animate = (currentTime: number) => {
       const elapsed = (currentTime - startTimeRef.current!) / 1000;
       const newTimeLeft = Math.max(0, initialTimeLeft - elapsed);
-
       setTimeLeft(newTimeLeft);
-
       if (newTimeLeft > 0) {
         animationFrameRef.current = requestAnimationFrame(animate);
       } else {
@@ -88,64 +80,64 @@ export const Timer: React.FC<TimerProps> = ({
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
-
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
   }, [isRunning, timeLeft, onComplete]);
 
   const displayTime = Math.ceil(timeLeft);
   const progress = (timeLeft / duration) * 100;
 
-  // SVG circle properties
-  const radius = size === 'sm' ? 28 : size === 'md' ? 44 : 60;
-  const circumference = 2 * Math.PI * radius;
+  const r = size === 'sm' ? 28 : size === 'md' ? 44 : 60;
+  const circumference = 2 * Math.PI * r;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
     <div
-      className={`relative inline-flex items-center justify-center ${sizeClasses[size]} ${className}`}
-      style={style}
+      className={className}
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...sizeDims[size],
+        ...style,
+      }}
       role="timer"
       aria-live="polite"
       aria-label={`${displayTime} seconds remaining`}
     >
-      {/* Progress ring */}
       {showProgress && (
         <svg
-          className="absolute inset-0 w-full h-full transform -rotate-90"
-          viewBox={`0 0 ${radius * 2 + 8} ${radius * 2 + 8}`}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}
+          viewBox={`0 0 ${r * 2 + 8} ${r * 2 + 8}`}
         >
           {/* Background circle */}
           <circle
-            cx={radius + 4}
-            cy={radius + 4}
-            r={radius}
-            stroke="currentColor"
+            cx={r + 4}
+            cy={r + 4}
+            r={r}
+            stroke={C.gray200}
             strokeWidth="4"
             fill="none"
-            className="text-gray-200"
           />
           {/* Progress circle */}
           <circle
-            cx={radius + 4}
-            cy={radius + 4}
-            r={radius}
-            stroke={progressColors[currentVariant]}
+            cx={r + 4}
+            cy={r + 4}
+            r={r}
+            stroke={variantColors[currentVariant]}
             strokeWidth="4"
             fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            className="transition-all duration-300 ease-linear"
+            style={{ transition: 'all 0.3s linear' }}
           />
         </svg>
       )}
 
-      {/* Time display */}
-      <span className={`font-bold ${variantColors[currentVariant]} z-10`}>
+      <span style={{ fontWeight: 700, color: variantColors[currentVariant], position: 'relative', zIndex: 1 }}>
         {displayTime}
       </span>
     </div>

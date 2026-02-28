@@ -90,9 +90,9 @@ playerOrder: shuffleArray(players.map(p => p.id)),
 
 ---
 
-### ~~UI components use custom Tailwind tokens~~ ✅ Fixed Feb 19, 2026
-**Symptom:** Components referenced non-existent tokens (`bg-surface`, `text-brand-primary`, etc.) that would not work in consumer projects without copying the Bonfire Tailwind config.
-**Fix:** Replaced all custom tokens with standard Tailwind v4 utilities across all 8 components and stories.
+### ~~UI components require Tailwind setup to render correctly~~ ✅ Fixed Feb 28, 2026
+**Symptom:** Components were visually broken out of the box — Lobby rendered as a disaster, PlayerAvatar became a full-width blob, buttons were browser defaults. Required consumer to install Tailwind AND configure the Bonfire preset with custom design tokens. A previous partial fix replaced custom tokens with standard Tailwind, but still required consumer Tailwind setup.
+**Fix:** Converted all 8 components to inline styles. Created a shared `src/utils/theme.ts` with color constants. Components now render correctly with zero consumer setup — no Tailwind, no CSS, no configuration required. Hover and focus states handled via React `onMouseEnter`/`onMouseLeave`/`onFocus`/`onBlur`. Tests updated from class-name assertions to style/attribute assertions.
 
 ---
 

@@ -83,18 +83,18 @@ The client package **does not depend on `@bonfire/server`**. Server response typ
 
 ## UI Components (Milestone 5)
 
-Pre-built React components for common party game UI patterns. Components use standard Tailwind CSS utility classes — no custom design tokens required. Consumers only need a standard Tailwind setup.
+Pre-built React components for common party game UI patterns. Components use inline styles with shared constants — no Tailwind or external CSS required. Consumers get correct styling with zero setup.
 
 ### Design System
 
-Components use standard Tailwind color palette (indigo for brand, gray for surfaces/text). No custom `@theme` tokens are used. The package's Tailwind config is only needed to run Storybook.
+Components use shared color, radius, and shadow constants defined in `src/utils/theme.ts`. No CSS classes are applied to structural or color concerns. Storybook no longer requires a separate CSS build step.
 
-**Color mapping used in components:**
-- Brand: `indigo-500` / `indigo-600`
-- Surfaces: `white` / `gray-100`
-- Text primary: `gray-900`
-- Text secondary: `gray-500`
-- Warning: `amber-500`, Error: `red-500`
+**Color mapping used in components (via `theme.ts` constants):**
+- Brand: indigo (`#6366f1` / `#4f46e5`)
+- Surfaces: white / light gray (`#f3f4f6`)
+- Text primary: `#111827`
+- Text secondary: `#6b7280`
+- Warning: amber (`#f59e0b`), Error: red (`#ef4444`)
 
 ### PlayerAvatar (`src/components/PlayerAvatar.tsx`)
 
@@ -308,7 +308,8 @@ packages/client/
 │   │   ├── VotingInterface.tsx     # Voting UI with results display
 │   │   └── VotingInterface.stories.tsx
 │   └── utils/
-│       └── colorHash.ts            # Deterministic player color utility
+│       ├── colorHash.ts            # Deterministic player color utility
+│       └── theme.ts                # Shared inline style constants (colors, radius, shadows)
 └── __tests__/
     ├── client/
     │   └── BonfireClient.test.ts

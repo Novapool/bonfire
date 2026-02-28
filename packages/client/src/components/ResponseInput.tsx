@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { C, radius } from '../utils/theme';
 
 // ---- Types ----
 
@@ -60,6 +61,24 @@ interface TextInputProps {
 }
 
 const TextInput: React.FC<TextInputProps> = ({ config, value, onChange, onSubmit, disabled }) => {
+  const [focused, setFocused] = useState(false);
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.75rem 1rem',
+    borderRadius: radius.md,
+    border: `2px solid ${focused ? C.indigo500 : C.gray200}`,
+    outline: 'none',
+    transition: 'border-color 0.15s ease',
+    color: C.gray900,
+    backgroundColor: C.white,
+    opacity: disabled ? 0.5 : 1,
+    cursor: disabled ? 'not-allowed' : undefined,
+    fontSize: '1rem',
+    fontFamily: 'inherit',
+    boxSizing: 'border-box',
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !config.multiline && !e.shiftKey) {
       e.preventDefault();
@@ -71,29 +90,34 @@ const TextInput: React.FC<TextInputProps> = ({ config, value, onChange, onSubmit
     value,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(e.target.value),
     onKeyDown: handleKeyDown,
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
     disabled,
     maxLength: config.maxLength,
     placeholder: config.placeholder || 'Type your answer…',
-    className: `w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:outline-none transition-colors text-gray-900 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed bg-white`,
+    style: inputStyle,
     'aria-label': 'Your response',
+  };
+
+  const counterStyle: React.CSSProperties = {
+    textAlign: 'right',
+    fontSize: '0.75rem',
+    color: C.gray500,
+    marginTop: '0.25rem',
   };
 
   return config.multiline ? (
     <div>
-      <textarea {...sharedProps} rows={3} />
+      <textarea {...sharedProps} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
       {config.maxLength && (
-        <div className="text-right text-xs text-gray-500 mt-1">
-          {value.length} / {config.maxLength}
-        </div>
+        <div style={counterStyle}>{value.length} / {config.maxLength}</div>
       )}
     </div>
   ) : (
     <div>
       <input type="text" {...sharedProps} />
       {config.maxLength && (
-        <div className="text-right text-xs text-gray-500 mt-1">
-          {value.length} / {config.maxLength}
-        </div>
+        <div style={counterStyle}>{value.length} / {config.maxLength}</div>
       )}
     </div>
   );
@@ -107,6 +131,8 @@ interface MultipleChoiceInputProps {
 }
 
 const MultipleChoiceInput: React.FC<MultipleChoiceInputProps> = ({ config, value, onChange, disabled }) => {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   const toggle = (id: string) => {
     if (config.allowMultiple) {
       onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
@@ -116,28 +142,57 @@ const MultipleChoiceInput: React.FC<MultipleChoiceInputProps> = ({ config, value
   };
 
   return (
-    <div className="space-y-2" role={config.allowMultiple ? 'group' : 'radiogroup'} aria-label="Answer choices">
+    <div
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+      role={config.allowMultiple ? 'group' : 'radiogroup'}
+      aria-label="Answer choices"
+    >
       {config.choices.map((choice) => {
         const selected = value.includes(choice.id);
+        const hovered = hoveredId === choice.id && !disabled && !selected;
+
+        let borderColor: string = C.gray200;
+        let bg: string = C.white;
+        let color: string = C.gray900;
+        let fontWeight: number | undefined;
+
+        if (selected) {
+          borderColor = C.indigo500;
+          bg = C.indigo50;
+          color = C.indigo600;
+          fontWeight = 600;
+        } else if (hovered) {
+          borderColor = C.indigo300;
+        }
+
         return (
           <button
             key={choice.id}
             type="button"
             onClick={() => !disabled && toggle(choice.id)}
             disabled={disabled}
+            onMouseEnter={() => setHoveredId(choice.id)}
+            onMouseLeave={() => setHoveredId(null)}
             aria-pressed={selected}
-            className={`
-              w-full text-left px-4 py-3 rounded-lg border-2 transition-all
-              ${selected
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-600 font-semibold'
-                : 'border-gray-200 bg-white text-gray-900 hover:border-indigo-300'
-              }
-              disabled:opacity-50 disabled:cursor-not-allowed
-            `.trim()}
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              padding: '0.75rem 1rem',
+              borderRadius: radius.md,
+              border: `2px solid ${borderColor}`,
+              backgroundColor: bg,
+              color,
+              fontWeight,
+              transition: 'all 0.15s ease',
+              opacity: disabled ? 0.5 : 1,
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit',
+              fontSize: '1rem',
+            }}
           >
-            <span className="font-medium">{choice.label}</span>
+            <span style={{ fontWeight: 500 }}>{choice.label}</span>
             {choice.description && (
-              <span className="block text-sm text-gray-500 font-normal mt-0.5">
+              <span style={{ display: 'block', fontSize: '0.875rem', color: C.gray500, fontWeight: 'normal', marginTop: '0.125rem' }}>
                 {choice.description}
               </span>
             )}
@@ -156,7 +211,6 @@ interface RankingInputProps {
 }
 
 const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, disabled }) => {
-  // value is ordered list of item IDs; items not yet ranked stay in unranked pool
   const ranked = value.map((id) => config.items.find((i) => i.id === id)).filter(Boolean) as Choice[];
   const unranked = config.items.filter((i) => !value.includes(i.id));
 
@@ -174,37 +228,64 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
     onChange(next);
   };
 
-  const addToRanking = (id: string) => {
-    onChange([...value, id]);
-  };
+  const addToRanking = (id: string) => onChange([...value, id]);
+  const removeFromRanking = (id: string) => onChange(value.filter((v) => v !== id));
 
-  const removeFromRanking = (id: string) => {
-    onChange(value.filter((v) => v !== id));
+  const ctrlBtn: React.CSSProperties = {
+    padding: '0.25rem',
+    borderRadius: radius.sm,
+    border: 'none',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   return (
-    <div className="space-y-4">
-      {/* Ranked list */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {ranked.length > 0 && (
-        <div className="space-y-2" aria-label="Your ranking">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }} aria-label="Your ranking">
           {ranked.map((item, index) => (
             <div
               key={item.id}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-indigo-200 bg-indigo-50"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                padding: '0.75rem 1rem',
+                borderRadius: radius.md,
+                border: `2px solid ${C.indigo200}`,
+                backgroundColor: C.indigo50,
+              }}
             >
-              <span className="w-6 h-6 rounded-full bg-indigo-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+              <span
+                style={{
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  borderRadius: '9999px',
+                  backgroundColor: C.indigo500,
+                  color: C.white,
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
                 {index + 1}
               </span>
-              <span className="flex-1 text-gray-900 font-medium">{item.label}</span>
-              <div className="flex gap-1">
+              <span style={{ flex: 1, color: C.gray900, fontWeight: 500 }}>{item.label}</span>
+              <div style={{ display: 'flex', gap: '0.25rem' }}>
                 <button
                   type="button"
                   onClick={() => moveUp(index)}
                   disabled={disabled || index === 0}
                   aria-label={`Move ${item.label} up`}
-                  className="p-1 rounded hover:bg-indigo-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  style={{ ...ctrlBtn, opacity: disabled || index === 0 ? 0.3 : 1 }}
                 >
-                  <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg style={{ width: '1rem', height: '1rem', color: C.indigo600 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                   </svg>
                 </button>
@@ -213,9 +294,9 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
                   onClick={() => moveDown(index)}
                   disabled={disabled || index === ranked.length - 1}
                   aria-label={`Move ${item.label} down`}
-                  className="p-1 rounded hover:bg-indigo-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  style={{ ...ctrlBtn, opacity: disabled || index === ranked.length - 1 ? 0.3 : 1 }}
                 >
-                  <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg style={{ width: '1rem', height: '1rem', color: C.indigo600 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -224,9 +305,9 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
                   onClick={() => removeFromRanking(item.id)}
                   disabled={disabled}
                   aria-label={`Remove ${item.label} from ranking`}
-                  className="p-1 rounded hover:bg-red-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  style={{ ...ctrlBtn, opacity: disabled ? 0.3 : 1 }}
                 >
-                  <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg style={{ width: '1rem', height: '1rem', color: C.red400 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -236,11 +317,10 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
         </div>
       )}
 
-      {/* Unranked pool */}
       {unranked.length > 0 && (
-        <div className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {ranked.length > 0 && (
-            <p className="text-xs text-gray-500">Tap to add to ranking:</p>
+            <p style={{ fontSize: '0.75rem', color: C.gray500, margin: 0 }}>Tap to add to ranking:</p>
           )}
           {unranked.map((item) => (
             <button
@@ -249,9 +329,25 @@ const RankingInput: React.FC<RankingInputProps> = ({ config, value, onChange, di
               onClick={() => !disabled && addToRanking(item.id)}
               disabled={disabled}
               aria-label={`Add ${item.label} to ranking`}
-              className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 bg-white text-gray-500 hover:border-indigo-300 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              style={{
+                width: '100%',
+                textAlign: 'left',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                padding: '0.75rem 1rem',
+                borderRadius: radius.md,
+                border: `2px dashed ${C.gray300}`,
+                backgroundColor: C.white,
+                color: C.gray500,
+                transition: 'all 0.15s ease',
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                fontFamily: 'inherit',
+                fontSize: '1rem',
+              }}
             >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg style={{ width: '1rem', height: '1rem', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               <span>{item.label}</span>
@@ -280,7 +376,8 @@ export const ResponseInput: React.FC<ResponseInputProps> = ({
   className = '',
   style,
 }) => {
-  // Normalize controlled value
+  const [submitHovered, setSubmitHovered] = useState(false);
+
   const isText = config.type === 'text';
   const internalValue: string | string[] = value ?? (isText ? '' : []);
 
@@ -295,8 +392,10 @@ export const ResponseInput: React.FC<ResponseInputProps> = ({
     ? (internalValue as string).trim().length > 0
     : (internalValue as string[]).length > 0;
 
+  const submitActive = canSubmit && !disabled;
+
   return (
-    <div className={`space-y-4 ${className}`} style={style}>
+    <div className={className} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', ...style }}>
       {config.type === 'text' && (
         <TextInput
           config={config}
@@ -329,14 +428,22 @@ export const ResponseInput: React.FC<ResponseInputProps> = ({
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={disabled || !canSubmit}
-          className={`
-            w-full py-3 px-6 rounded-lg font-semibold transition-all
-            ${canSubmit && !disabled
-              ? 'bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            }
-          `.trim()}
+          disabled={!submitActive}
+          onMouseEnter={() => setSubmitHovered(true)}
+          onMouseLeave={() => setSubmitHovered(false)}
+          style={{
+            width: '100%',
+            padding: '0.75rem 1.5rem',
+            borderRadius: radius.md,
+            border: 'none',
+            fontWeight: 600,
+            fontSize: '1rem',
+            fontFamily: 'inherit',
+            transition: 'all 0.15s ease',
+            cursor: submitActive ? 'pointer' : 'not-allowed',
+            backgroundColor: submitActive ? (submitHovered ? C.indigo600 : C.indigo500) : C.gray200,
+            color: submitActive ? C.white : C.gray400,
+          }}
           aria-label="Submit response"
         >
           {submitLabel}
